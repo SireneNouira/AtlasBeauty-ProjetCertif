@@ -1,0 +1,31 @@
+parameters:
+
+services:
+    _defaults:
+        autowire: true      # Injection automatique des dépendances
+        autoconfigure: true # Enregistrement automatique des services
+
+    # Transformer pour DTO -> Entité
+    App\DataTransformer\PatientGlobalDtoToEntityTransformer:
+        arguments:
+            $serializer: '@serializer'
+            $entityManager: '@doctrine.orm.entity_manager'
+        tags: ['api_platform.data_transformer']
+        
+    App\DataPersister\PatientDataPersister:
+        arguments:
+            $entityManager: '@doctrine.orm.entity_manager'
+        tags: ['api_platform.data_persister']
+
+
+    # makes classes in src/ available to be used as services
+    # this creates a service per class whose id is the fully-qualified class name
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/Kernel.php'
+
+    # add more service definitions when explicit configuration is needed
+    # please note that last definitions always *replace* previous ones

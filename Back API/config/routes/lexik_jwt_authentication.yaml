@@ -1,4 +1,0 @@
-lexik_jwt_authentication_login:
-    path: /login_check
-    controller: lexik_jwt_authentication.controller.authentication::getToken
-    methods: [POST]
