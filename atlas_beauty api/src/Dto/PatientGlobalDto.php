@@ -2,6 +2,7 @@
 
 namespace App\Dto;
 
+use App\Entity\Intervention;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -106,9 +107,16 @@ class PatientGlobalDto
 
     #[Assert\NotBlank]
     #[Groups(['patient:write'])]
-    public string $intervention_1_name;
+    /**
+     * @var Intervention
+     */
+    public ?Intervention $intervention_1_name;
 
    
     #[Groups(['patient:write'])]
-    public string $intervention_2_name;
+     /**
+     * @var Intervention
+     */
+    public ?Intervention $intervention_2_name;
 }
+

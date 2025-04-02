@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use App\Repository\InterventionRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -12,12 +14,16 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ORM\Entity(repositoryClass: InterventionRepository::class)]
 #[ApiResource(
     normalizationContext: ['groups' => ['demandeDevis:read']],
-    // operations: [
-    //     'get' => ['security' => "is_granted('PUBLIC_ACCESS')"],
-    //     'post' => ['security' => "is_granted('ROLE_ADMIN')"],
-    //     'put' => ['security' => "is_granted('ROLE_ADMIN')"],
-    //     'delete' => ['security' => "is_granted('ROLE_ADMIN')"]
-    // ]
+    operations: [
+        new Get(
+            normalizationContext: ['groups' => ['demandeDevis:read']],
+            security: "is_granted('PUBLIC_ACCESS')"
+        ),
+        new GetCollection(
+            normalizationContext: ['groups' => ['demandeDevis:read']],
+            security: "is_granted('PUBLIC_ACCESS')"
+        ),
+    ]
 )]
 class Intervention
 {
@@ -26,7 +32,7 @@ class Intervention
     #[ORM\Column]
     private ?int $id = null;
 
-    #[Groups([ 'demandeDevis:read'])]
+    #[Groups([ 'demandeDevis:read', 'patient:read', 'demandeDevis:read'])]
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
