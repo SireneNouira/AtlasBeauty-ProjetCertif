@@ -23,7 +23,9 @@ class PatientGlobalDtoToEntityTransformer
 
     public function transform(PatientGlobalDto $dto, Patient $patient,  array $context = []): Patient
     {
-        // dd($dto);
+
+        // Conservation de photoFile pour traitement ultérieur
+        // $photoFile = $dto->photoFile;
 
         // Si un patient existe déjà (pour une mise à jour), on le récupère
         $context = [
@@ -33,36 +35,42 @@ class PatientGlobalDtoToEntityTransformer
             $context[AbstractNormalizer::OBJECT_TO_POPULATE] = $patient;
         }
 
-        dd($dto);
+        // dd($dto);
 
-        // Désérialise le DTO en entité Patient
-        $patient = $this->serializer->deserialize(
-            $this->serializer->serialize($dto, 'json'),
-            Patient::class,
-            'json',
-            $context
-        );
+        // Transfert manuel des propriétés du DTO vers l'entité Patient
+        $patient->setEmail($dto->email);
+        if (!empty($dto->password)) {
+            $patient->setPassword($dto->password);
+        }
+        $patient->setNom($dto->nom);
+        $patient->setPrenom($dto->prenom);
+        $patient->setCivilite($dto->civilite);
+        $patient->setAnneeNaissance($dto->annee_naissance);
+        $patient->setPays($dto->pays);
+        $patient->setProfession($dto->profession);
+        $patient->setTel($dto->tel);
+        $patient->setPoids($dto->poids);
+        $patient->setTaille($dto->taille);
+        $patient->setTabac($dto->tabac);
+        $patient->setAlcool($dto->alcool);
+        $patient->setMedicament($dto->medicament);
+        $patient->setAllergie($dto->allergie);
+        $patient->setMaladie($dto->maladie);
+        $patient->setAntecendentChirurgicaux($dto->antecendent_chirurgicaux);
+        $patient->setVille($dto->ville);
+        $patient->setAdress($dto->adress);
+        $patient->setCodePostal($dto->code_postal);
 
-
-        
-        $patient->setPoids((float) $dto->poids); // Utilisez $dto au lieu de $object
-        $patient->setTaille((float) $dto->taille); // Utilisez $dto au lieu de $object
-
-        dd($patient);
-
-        $dto->tabac = filter_var($dto->tabac, FILTER_VALIDATE_BOOLEAN);
-        $dto->alcool = filter_var($dto->alcool, FILTER_VALIDATE_BOOLEAN);
-
-        // Gérer les valeurs nulles
-        $dto->antecendent_chirurgicaux = $dto->antecendent_chirurgicaux ?? 'Aucun';
 
         // Gérer la photo
-        if ($dto->photoFile) {
+        if (
+            $dto->photoFile instanceof \Symfony\Component\HttpFoundation\File\UploadedFile &&
+            $dto->photoFile->getError() === UPLOAD_ERR_OK
+        ) {
             $photo = new Photo();
-            $photo->setPhotoFile($dto->photoFile); // VichUploaderBundle gère le reste
-            $photo->setPatient($patient);
-
-            // Associer la photo au patient
+            $photo->setPhotoFile($dto->photoFile);
+            // Ne pas définir explicitement photoPath, VichUploader le fera
+            $photo->setPatient($patient); // Important: établir la relation bidirectionnelle
             $patient->addPhoto($photo);
         }
 
@@ -86,7 +94,11 @@ class PatientGlobalDtoToEntityTransformer
             }
         }
 
+
+
+
         if ($dto->intervention_2_name) {
+
             $intervention2 = $this->entityManager
                 ->getRepository(Intervention::class)
                 ->findOneBy(['name' => $dto->intervention_2_name]);
@@ -98,6 +110,8 @@ class PatientGlobalDtoToEntityTransformer
 
         // Associe les entités
         $patient->addDemandeDevis($demandeDevis);
+
+
 
         return $patient;
     }

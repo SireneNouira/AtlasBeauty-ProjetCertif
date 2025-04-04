@@ -5,8 +5,10 @@ namespace App\Dto;
 use App\Entity\Intervention;
 use phpDocumentor\Reflection\Types\Nullable;
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints\Date;
 use Symfony\Component\Validator\Constraints\Type;
 
 class PatientGlobalDto
@@ -34,7 +36,7 @@ class PatientGlobalDto
 
 
     #[Groups(['patient:write'])]
-    public  $annee_naissance;
+    public int $annee_naissance;
 
     //#[Assert\NotBlank]
     #[Groups(['patient:write'])]
@@ -50,11 +52,11 @@ class PatientGlobalDto
 
     //#[Assert\NotBlank]
     #[Groups(['patient:write'])]
-    public string $poids;
+    public float $poids;
     
     //#[Assert\NotBlank]
     #[Groups(['patient:write'])]
-    public string $taille;
+    public float $taille;
 
     //#[Assert\NotBlank]
     #[Groups(['patient:write'])]
@@ -94,24 +96,21 @@ class PatientGlobalDto
 
     #[Groups(['patient:write'])]
     #[Assert\File(mimeTypes: ['image/jpeg', 'image/png'], mimeTypesMessage: 'Veuillez envoyer une image valide (JPEG ou PNG).', notFoundMessage: 'Aucun fichier trouvé.')]
-    public ?File $photoFile = null;
-    
+    public $photoFile = null;
 
     //#[Assert\NotBlank]
     #[Groups(['patient:write'])]
     public string $note;
 
     #[Groups(['patient:write'])]
-    public $date_souhaite;
-
-
+    public string $date_souhaite;
 
     //#[Assert\NotBlank]
     #[Groups(['patient:write'])]
     public string $intervention_1_name;
 
-   
+    // Doit être initialisé à null pour éviter les erreurs de sérialisation (cannot access before initialization)
     #[Groups(['patient:write'])]
-    public string $intervention_2_name;
+    public ?string $intervention_2_name = null;
 }
 

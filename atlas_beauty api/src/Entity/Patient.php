@@ -39,7 +39,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
             validationContext: ['groups' => ['Default']],
             security: "is_granted('PUBLIC_ACCESS')",
             processor: PatientDataPersister::class,
-            // inputFormats: ['multipart' => ['multipart/form-data'], 'json' => ['application/json']]
+            inputFormats: ['multipart' => ['multipart/form-data'], 'json' => ['application/json']]
         ),
         new Put(
             security: "is_granted('PATIENT_EDIT', object)",
@@ -58,7 +58,7 @@ class Patient implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
-    #[Groups(['patient:write','patient:read', 'patient:update'])]
+    #[Groups(['patient:write', 'patient:read', 'patient:update'])]
     private ?string $email = null;
 
     /**
@@ -75,43 +75,43 @@ class Patient implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $password = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['patient:write','patient:read', 'patient:update'])]
+    #[Groups(['patient:write', 'patient:read', 'patient:update'])]
     private ?string $nom = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['patient:write','patient:read', 'patient:update'])]
+    #[Groups(['patient:write', 'patient:read', 'patient:update'])]
     private ?string $prenom = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['patient:write','patient:read', 'patient:update'])]
+    #[Groups(['patient:write', 'patient:read', 'patient:update'])]
     private ?string $civilite = null;
 
     #[ORM\Column(type: "integer", nullable: true)]
-    #[Groups(['patient:write','patient:read', 'patient:update'])]
+    #[Groups(['patient:write', 'patient:read', 'patient:update'])]
     private ?int $annee_naissance = null;
 
-    #[Groups(['patient:write','patient:read', 'patient:update'])]
+    #[Groups(['patient:write', 'patient:read', 'patient:update'])]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $adress = null;
 
-    #[Groups(['patient:write','patient:read', 'patient:update'])]
+    #[Groups(['patient:write', 'patient:read', 'patient:update'])]
     #[ORM\Column(type: Types::BIGINT, nullable: true)]
     private ?string $code_postal = null;
 
-    #[Groups(['patient:write','patient:read', 'patient:update'])]
+    #[Groups(['patient:write', 'patient:read', 'patient:update'])]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $ville = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['patient:write','patient:read', 'patient:update'])]
+    #[Groups(['patient:write', 'patient:read', 'patient:update'])]
     private ?string $pays = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['patient:write','patient:read', 'patient:update'])]
+    #[Groups(['patient:write', 'patient:read', 'patient:update'])]
     private ?string $profession = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['patient:write','patient:read', 'patient:update'])]
+    #[Groups(['patient:write', 'patient:read', 'patient:update'])]
     private ?string $tel = null;
 
     #[ORM\Column(type: "decimal", precision: 5, scale: 2, nullable: true)]
@@ -119,42 +119,42 @@ class Patient implements UserInterface, PasswordAuthenticatedUserInterface
     private ?float $poids = null;
 
     #[ORM\Column(type: "decimal", precision: 5, scale: 1, nullable: true)]
-    #[Groups(['patient:write','patient:read', 'patient:update'])]
+    #[Groups(['patient:write', 'patient:read', 'patient:update'])]
     private ?float $taille = null;
 
     #[ORM\Column]
-    #[Groups(['patient:write','patient:read', 'patient:update'])]
+    #[Groups(['patient:write', 'patient:read', 'patient:update'])]
     private ?bool $tabac = null;
 
     #[ORM\Column]
-    #[Groups(['patient:write','patient:read', 'patient:update'])]
+    #[Groups(['patient:write', 'patient:read', 'patient:update'])]
     private ?bool $alcool = null;
 
-    #[Groups(['patient:write','patient:read', 'patient:update'])]
+    #[Groups(['patient:write', 'patient:read', 'patient:update'])]
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $medicament = null;
 
-    #[Groups(['patient:write','patient:read', 'patient:update'])]
+    #[Groups(['patient:write', 'patient:read', 'patient:update'])]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $allergie = null;
 
-    #[Groups(['patient:write','patient:read', 'patient:update'])]
+    #[Groups(['patient:write', 'patient:read', 'patient:update'])]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $maladie = null;
 
-    #[Groups(['patient:write','patient:read', 'patient:update'])]
+    #[Groups(['patient:write', 'patient:read', 'patient:update'])]
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $antecendent_chirurgicaux = null;
 
     #[ORM\OneToMany(mappedBy: "patient", targetEntity: Photo::class, cascade: ["persist", "remove"])]
     private Collection $photos;
-  
 
-    
+
+
     /**
      * @var Collection<int, DemandeDevis>
      */
-    #[ORM\OneToMany(targetEntity: DemandeDevis::class, mappedBy: 'patient')]
+    #[ORM\OneToMany(targetEntity: DemandeDevis::class, mappedBy: 'patient', cascade: ['persist', 'remove'])]
     private Collection $demandeDevis;
 
     #[ORM\OneToOne(mappedBy: 'patient', cascade: ['persist', 'remove'])]
@@ -276,12 +276,12 @@ class Patient implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getAnneeNaissance(): ?\DateTimeInterface
+    public function getAnneeNaissance(): int
     {
         return $this->annee_naissance;
     }
 
-    public function setAnneeNaissance( $annee_naissance): static
+    public function setAnneeNaissance(int $annee_naissance): static
     {
         $this->annee_naissance = $annee_naissance;
 
@@ -360,24 +360,24 @@ class Patient implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getPoids(): ?string
+    public function getPoids(): ?float
     {
         return $this->poids;
     }
 
-    public function setPoids(string $poids): static
+    public function setPoids(float $poids): static
     {
         $this->poids = $poids;
 
         return $this;
     }
 
-    public function getTaille(): ?string
+    public function getTaille(): ?float
     {
         return $this->taille;
     }
 
-    public function setTaille(string $taille): static
+    public function setTaille(float $taille): static
     {
         $this->taille = $taille;
 
@@ -460,14 +460,14 @@ class Patient implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return $this->photos;
     }
-    
+
     public function addPhoto(Photo $photo): self
     {
         if (!$this->photos->contains($photo)) {
             $this->photos->add($photo);
             $photo->setPatient($this);
         }
-    
+
         return $this;
     }
 
@@ -479,11 +479,11 @@ class Patient implements UserInterface, PasswordAuthenticatedUserInterface
                 $photo->setPatient(null);
             }
         }
-    
+
         return $this;
     }
 
-  
+
 
     /**
      * @return Collection<int, DemandeDevis>

@@ -1,10 +1,12 @@
 <?php
+// src/Entity/Photo.php
 
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Vich\UploaderBundle\Mapping\Annotation as Vich;
 use Symfony\Component\HttpFoundation\File\File;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity]
 #[Vich\Uploadable]
@@ -25,6 +27,9 @@ class Photo
     #[ORM\JoinColumn(nullable: false)]
     private ?Patient $patient = null;
 
+    #[ORM\Column(type: "datetime", nullable: true)]
+    private ?\DateTimeInterface $updatedAt = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -33,6 +38,11 @@ class Photo
     public function setPhotoFile(?File $photoFile = null): void
     {
         $this->photoFile = $photoFile;
+
+        if (null !== $photoFile) {
+            // Pour que Doctrine détecte les changements quand le fichier change
+            $this->updatedAt = new \DateTimeImmutable();
+        }
     }
 
     public function getPhotoFile(): ?File
@@ -45,7 +55,7 @@ class Photo
         return $this->photoPath;
     }
 
-    public function setPhotoPath(string $photoPath): self
+    public function setPhotoPath(?string $photoPath): self
     {
         $this->photoPath = $photoPath;
         return $this;
