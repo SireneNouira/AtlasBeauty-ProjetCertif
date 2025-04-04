@@ -2,3 +2,11 @@ api_platform:
     resource: .
     type: api_platform
     prefix: /api
+
+# api_register:
+#   path: /api/register
+#   methods: ['POST']
+#   controller: App\Controller\SecurityController::register
+#   defaults:
+#     _api_resource_class: App\Entity\Patient
+#     _api_operation_name: post_register

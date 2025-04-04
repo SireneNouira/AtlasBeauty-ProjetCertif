@@ -15,15 +15,18 @@ class PatientDataPersister implements ProcessorInterface
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly UserPasswordHasherInterface $passwordHasher,
-        private readonly PatientGlobalDtoToEntityTransformer $transformer 
+        private readonly PatientGlobalDtoToEntityTransformer $transformer
     ) {}
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): Patient
     {
-          // Vérifiez si $data est un PatientGlobalDto
-          if ($data instanceof PatientGlobalDto) {
+        
+        // Vérifiez si $data est un PatientGlobalDto
+        if ($data instanceof PatientGlobalDto) {
             // Transformez le DTO en entité Patient
             $patient = $this->transformer->transform($data, new Patient());
+
+            // dd($patient);
 
             if ($patient->getPassword()) {
                 $hashedPassword = $this->passwordHasher->hashPassword($patient, $patient->getPassword());
@@ -31,10 +34,10 @@ class PatientDataPersister implements ProcessorInterface
             }
             $patient->setRoles(['ROLE_USER']);
 
-             // Persistez le patient et les entités associées
-             $this->entityManager->persist($patient);
+            // Persistez le patient et les entités associées
+            $this->entityManager->persist($patient);
 
-             foreach ($patient->getPhotos() as $photo) {
+            foreach ($patient->getPhotos() as $photo) {
                 $photo->setPatient($patient); // Associe le patient à la photo
                 $this->entityManager->persist($photo); // Persiste la photo
             }
@@ -45,7 +48,7 @@ class PatientDataPersister implements ProcessorInterface
                 $demandeDevis->setDateCreation(new \DateTime());
                 $this->entityManager->persist($demandeDevis);
             }
-            
+
             $this->entityManager->flush();
 
             return $patient; // Retournez l'entité Patient

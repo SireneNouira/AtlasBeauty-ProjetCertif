@@ -17,9 +17,16 @@ services:
             $entityManager: '@doctrine.orm.entity_manager'
         tags: ['api_platform.data_persister']
     App\Service\MeProvider: ~
+
     App\Security\AuthenticationSuccessHandler:
         arguments:
             $jwtManager: '@lexik_jwt_authentication.jwt_manager'
+            
+    App\Serializer\Encoder\MultipartFormDataDecoder:
+        arguments:
+            - '@request_stack'
+        tags:
+            - { name: 'serializer.encoder' }
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
     App\:

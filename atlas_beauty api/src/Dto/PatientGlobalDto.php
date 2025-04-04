@@ -3,6 +3,7 @@
 namespace App\Dto;
 
 use App\Entity\Intervention;
+use phpDocumentor\Reflection\Types\Nullable;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -10,24 +11,24 @@ use Symfony\Component\Validator\Constraints\Type;
 
 class PatientGlobalDto
 {
-    #[Assert\NotBlank]
+    // #[Assert\NotBlank]
     #[Assert\Email]
     #[Groups(['patient:write'])]
     public string $email;
 
-    #[Assert\NotBlank]
+    // #[Assert\NotBlank]
     #[Groups(['patient:write'])]
     public string $password;
 
-    #[Assert\NotBlank]
+    // #[Assert\NotBlank]
     #[Groups(['patient:write'])]
     public string $nom;
 
-    #[Assert\NotBlank]
+    // #[Assert\NotBlank]
     #[Groups(['patient:write'])]
     public string $prenom;
 
-    #[Assert\NotBlank]
+    //#[Assert\NotBlank]
     #[Groups(['patient:write'])]
     public string $civilite;
 
@@ -35,68 +36,68 @@ class PatientGlobalDto
     #[Groups(['patient:write'])]
     public  $annee_naissance;
 
-    #[Assert\NotBlank]
+    //#[Assert\NotBlank]
     #[Groups(['patient:write'])]
     public string $pays;
 
-    #[Assert\NotBlank]
+    //#[Assert\NotBlank]
     #[Groups(['patient:write'])]
     public string $profession;
 
-    #[Assert\NotBlank]
+    //#[Assert\NotBlank]
     #[Groups(['patient:write'])]
     public string $tel;
 
-    #[Assert\NotBlank]
+    //#[Assert\NotBlank]
     #[Groups(['patient:write'])]
     public string $poids;
     
-    #[Assert\NotBlank]
+    //#[Assert\NotBlank]
     #[Groups(['patient:write'])]
     public string $taille;
 
-    #[Assert\NotBlank]
+    //#[Assert\NotBlank]
     #[Groups(['patient:write'])]
     public string $medicament;
 
-    #[Assert\NotBlank]
+    //#[Assert\NotBlank]
     #[Groups(['patient:write'])]
     public string $allergie;
 
-    #[Assert\NotBlank]
+    //#[Assert\NotBlank]
     #[Groups(['patient:write'])]
     public string $maladie;
 
-    #[Assert\NotBlank]
+    #[Assert\Type('string')]
     #[Groups(['patient:write'])]
-    public string $antecendent_chirurgicaux;
+    public ?string $antecendent_chirurgicaux = null;
 
-    #[Assert\NotBlank]
+    //#[Assert\NotBlank]
     #[Groups(['patient:write'])]
     public string $ville;
 
-    #[Assert\NotBlank]
+    //#[Assert\NotBlank]
     #[Groups(['patient:write'])]
     public string $adress;
     
-    #[Assert\NotBlank]
+    //#[Assert\NotBlank]
     #[Groups(['patient:write'])]
     public string $code_postal;
 
     #[Assert\NotNull]
     #[Groups(['patient:write'])]
-    public bool $tabac;
+    public bool $tabac = false;
 
     #[Assert\NotNull]
     #[Groups(['patient:write'])]
-    public bool $alcool;
+    public bool $alcool = false;
 
     #[Groups(['patient:write'])]
     #[Assert\File(mimeTypes: ['image/jpeg', 'image/png'], mimeTypesMessage: 'Veuillez envoyer une image valide (JPEG ou PNG).', notFoundMessage: 'Aucun fichier trouvé.')]
     public ?File $photoFile = null;
     
 
-    #[Assert\NotBlank]
+    //#[Assert\NotBlank]
     #[Groups(['patient:write'])]
     public string $note;
 
@@ -105,18 +106,12 @@ class PatientGlobalDto
 
 
 
-    #[Assert\NotBlank]
+    //#[Assert\NotBlank]
     #[Groups(['patient:write'])]
-    /**
-     * @var Intervention
-     */
-    public ?Intervention $intervention_1_name;
+    public string $intervention_1_name;
 
    
     #[Groups(['patient:write'])]
-     /**
-     * @var Intervention
-     */
-    public ?Intervention $intervention_2_name;
+    public string $intervention_2_name;
 }
 

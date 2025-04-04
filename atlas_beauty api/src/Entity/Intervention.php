@@ -39,7 +39,7 @@ class Intervention
     /**
      * @var Collection<int, DemandeDevis>
      */
-    #[ORM\OneToMany(targetEntity: DemandeDevis::class, mappedBy: 'intervention_1')]
+    #[ORM\OneToMany(targetEntity: DemandeDevis::class, mappedBy: 'intervention')]
     private Collection $demandeDevis;
 
     public function __construct()

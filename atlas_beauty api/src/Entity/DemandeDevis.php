@@ -25,7 +25,8 @@ operations: [
     ),
     new Post(
         security: "is_granted('DEMANDE_DEVIS_CREATE')",
-        securityMessage: "Vous avez déjà une demande de devis en cours. Supprimez-la avant d'en créer une nouvelle."
+        securityMessage: "Vous avez déjà une demande de devis en cours. Supprimez-la avant d'en créer une nouvelle.",
+        inputFormats: ['multipart' => ['multipart/form-data'], 'json' => ['application/json']]
     ),
     new Put(
         security: "is_granted('DEMANDE_DEVIS_EDIT', object)",

@@ -23,11 +23,17 @@ class PatientGlobalDtoToEntityTransformer
 
     public function transform(PatientGlobalDto $dto, Patient $patient,  array $context = []): Patient
     {
+        // dd($dto);
+
         // Si un patient existe déjà (pour une mise à jour), on le récupère
-        $context = [];
+        $context = [
+            AbstractNormalizer::GROUPS => ['patient:write'],
+        ];
         if ($patient) {
             $context[AbstractNormalizer::OBJECT_TO_POPULATE] = $patient;
         }
+
+        dd($dto);
 
         // Désérialise le DTO en entité Patient
         $patient = $this->serializer->deserialize(
@@ -37,14 +43,25 @@ class PatientGlobalDtoToEntityTransformer
             $context
         );
 
+
+        
         $patient->setPoids((float) $dto->poids); // Utilisez $dto au lieu de $object
         $patient->setTaille((float) $dto->taille); // Utilisez $dto au lieu de $object
 
+        dd($patient);
+
+        $dto->tabac = filter_var($dto->tabac, FILTER_VALIDATE_BOOLEAN);
+        $dto->alcool = filter_var($dto->alcool, FILTER_VALIDATE_BOOLEAN);
+
+        // Gérer les valeurs nulles
+        $dto->antecendent_chirurgicaux = $dto->antecendent_chirurgicaux ?? 'Aucun';
+
+        // Gérer la photo
         if ($dto->photoFile) {
             $photo = new Photo();
             $photo->setPhotoFile($dto->photoFile); // VichUploaderBundle gère le reste
             $photo->setPatient($patient);
-    
+
             // Associer la photo au patient
             $patient->addPhoto($photo);
         }
