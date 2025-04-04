@@ -68,7 +68,7 @@ const RegisterForm = () => {
   useEffect(() => {
     const fetchInterventions = async () => {
       try {
-        const response = await api.get("/interventions?page=1");
+        const response = await api.get("/api/interventions?page=1");
 
         // Vérifie si la clé 'member' existe dans la réponse et est un tableau
         if (Array.isArray(response.data.member)) {
@@ -122,14 +122,14 @@ const RegisterForm = () => {
     setIsSubmitting(true);
     setError(null);
 
-    if (formData.intervention_1_name === formData.intervention_2_name) {
+    if (formData.intervention_2_name && formData.intervention_1_name === formData.intervention_2_name) {
       setError("Les deux interventions doivent être différentes.");
       setIsSubmitting(false);
       return;
     }
     const fetchInterventions = async () => {
       try {
-        const response = await api.get("/interventions");
+        const response = await api.get("/api/interventions");
         console.log("DATA:", response.data); // Vérifiez la structure réelle
 
         // Essayez ces différentes possibilités
@@ -172,7 +172,7 @@ const RegisterForm = () => {
         }
       });
 
-      const response = await api.post("/register", formDataToSend, {
+      const response = await api.post("/api/register", formDataToSend, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -604,14 +604,15 @@ const RegisterForm = () => {
         </div>
 
         <div className="flex flex-col">
-        <DatePickerField className="text-sm font-medium"
-          id="date_souhaite"
-          name="date_souhaite"
-          label="Date souhaitée pour l'intervention"
-          selected={formData.date_souhaite}
-          onChange={handleDateChange}
-        />
- </div>
+          <DatePickerField
+            className="text-sm font-medium"
+            id="date_souhaite"
+            name="date_souhaite"
+            label="Date souhaitée pour l'intervention"
+            selected={formData.date_souhaite}
+            onChange={handleDateChange}
+          />
+        </div>
         {/* Bouton d'envoi */}
         <button
           type="submit"
