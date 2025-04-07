@@ -170,7 +170,7 @@ export default function RegisterForm() {
     e.preventDefault();
     setIsSubmitting(true);
     setError(null);
-
+  
     // Validation des champs de l'étape 2
     if (
       !formData.poids ||
@@ -182,7 +182,7 @@ export default function RegisterForm() {
       setIsSubmitting(false);
       return;
     }
-
+  
     if (
       formData.intervention_2_name &&
       formData.intervention_1_name === formData.intervention_2_name
@@ -191,9 +191,9 @@ export default function RegisterForm() {
       setIsSubmitting(false);
       return;
     }
-
+  
     try {
-      // Préparation des données pour l'API
+      // 1. Préparation des données de base
       const payload = {
         email: formData.email,
         password: formData.password,
@@ -213,85 +213,84 @@ export default function RegisterForm() {
         tabac: formData.tabac,
         alcool: formData.alcool,
         note: formData.note,
-        date_souhaite:
-          formData.date_souhaite?.toISOString().split("T")[0] || "",
+        date_souhaite: formData.date_souhaite?.toISOString().split("T")[0] || "",
         intervention_1_name: formData.intervention_1_name,
-        intervention_2_name: formData.intervention_2_name || null, // Envoie null si vide
-        // On n'envoie photoFiles que si il y a des fichiers
-        ...(formData.photoFiles.length > 0 && {
-          photoFiles: formData.photoFiles,
-        }),
+        intervention_2_name: formData.intervention_2_name || null,
       };
-
-      // Création FormData seulement si besoin (fichiers présents)
-      // let headers: { 'Content-Type': string } | {} = { 
-      //   'Content-Type': 'application/json' 
-      // };
-    
-      type ApiHeaders = 
-      | { 'Content-Type': 'application/json' }
-      | Record<string, never>; // Objet vide
-    
-    let headers: ApiHeaders = { 'Content-Type': 'application/json' };
-    
-      let requestData: any = payload;
-
+  
+      // 2. Gestion des fichiers et format d'envoi
       if (formData.photoFiles.length > 0) {
         const formDataToSend = new FormData();
+        
+        // Ajout de tous les champs au FormData
         Object.entries(payload).forEach(([key, value]) => {
-          if (key === "photoFiles") {
-            (value as File[]).forEach((file) => {
-              formDataToSend.append("photoFiles", file);
-            });
-          } else if (value !== null && value !== undefined) {
+          if (value !== null && value !== undefined) {
             formDataToSend.append(key, value.toString());
           }
         });
-        requestData = formDataToSend;
-        headers = {}; // Let the browser set Content-Type with boundary for FormData
-      }
-
-      const response = await api.post("/register", requestData, {
-        headers: headers,
-      });
-
-      // Gestion de la réponse
-      if (response.data.token) {
-        document.cookie = `BEARER=${
-          response.data.token
-        }; path=/; Secure; SameSite=Strict${
-          window.location.protocol === "https:" ? "; Secure" : ""
-        }`;
-      }
-
-      alert("Inscription réussie !");
-      // window.location.href = "/dashboard"; // Redirection si nécessaire
-    } catch (err: any) {
-      console.error("Registration error:", err);
-
-      // Gestion améliorée des erreurs
-      if (err.response) {
-        if (err.response.data.violations) {
-          setError(
-            err.response.data.violations
-              .map((v: { message: string }) => v.message)
-              .join(", ")
-          );
-        } else {
-          setError(
-            err.response.data.message ||
-              err.response.data.title ||
-              "Erreur lors de l'envoi du formulaire"
-          );
-        }
+        
+        // Ajout des fichiers avec la syntaxe photoFiles[]
+        formData.photoFiles.forEach((file, index) => {
+          formDataToSend.append(`photoFiles[${index}]`, file);
+        });
+  
+        // Envoi en multipart/form-data
+        const response = await api.post("/register", formDataToSend, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+        
+        // Gestion de la réponse
+        handleResponse(response);
       } else {
-        setError("Erreur de connexion au serveur");
+        // Envoi en JSON sans fichiers
+        const response = await api.post("/register", payload, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        
+        handleResponse(response);
       }
+  
+    } catch (err: any) {
+      handleError(err);
     } finally {
       setIsSubmitting(false);
     }
   };
- 
+  
+  // Fonction helper pour gérer la réponse
+  const handleResponse = (response: any) => {
+    if (response.data.token) {
+      document.cookie = `BEARER=${response.data.token}; path=/; Secure; SameSite=Strict${
+        window.location.protocol === "https:" ? "; Secure" : ""
+      }`;
+    }
+    alert("Inscription réussie !");
+  };
+  
+  // Fonction helper pour gérer les erreurs
+  const handleError = (err: any) => {
+    console.error("Registration error:", err);
+    
+    if (err.response) {
+      if (err.response.data.violations) {
+        setError(
+          err.response.data.violations
+            .map((v: { message: string }) => v.message)
+            .join("\n")
+        );
+      } else if (err.response.data.detail) {
+        setError(err.response.data.detail);
+      } else {
+        setError("Erreur lors de l'envoi du formulaire");
+      }
+    } else {
+      setError("Erreur de connexion au serveur");
+    }
+  };
 
   return (
     <div className="max-w-3xl mx-auto p-6 mt-8 border rounded-lg shadow-md">
