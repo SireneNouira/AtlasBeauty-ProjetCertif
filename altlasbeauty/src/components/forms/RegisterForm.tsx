@@ -1,39 +1,43 @@
 "use client";
+
 import { useEffect, useState } from "react";
-import axios from "axios";
 import api from "../../utils/api";
 import { DatePickerField } from "../DatePickerField";
 
-const RegisterForm = () => {
-  type FormDataType = {
-    email: string;
-    password: string;
-    nom: string;
-    prenom: string;
-    civilite: string;
-    annee_naissance: string;
-    pays: string;
-    profession: string;
-    tel: string;
-    poids: string;
-    taille: string;
-    medicament: string;
-    allergie: string;
-    maladie: string;
-    antecendent_chirurgicaux: string;
-    ville: string;
-    adress: string;
-    code_postal: string;
-    tabac: boolean;
-    alcool: boolean;
-    photoFile: File | null;
-    note: string;
-    date_souhaite: Date | null;
-    intervention_1_name: string;
-    intervention_2_name: string;
-    // [key: string]: string | boolean | File | null;
-  };
+type Civilite = "Mr" | "Mme" | "Mlle" | "";
 
+type FormDataType = {
+  email: string;
+  password: string;
+  nom: string;
+  prenom: string;
+  civilite: Civilite;
+  annee_naissance: string;
+  pays: string;
+  profession: string;
+  tel: string;
+  ville: string;
+  adress: string;
+  code_postal: string;
+  poids: string;
+  taille: string;
+  antecedents: string;
+  tabac: boolean;
+  alcool: boolean;
+  photoFiles: File[];
+  note: string;
+  date_souhaite: Date | null;
+  intervention_1_name: string;
+  intervention_2_name: string;
+};
+
+type Intervention = {
+  "@id": string;
+  name: string;
+};
+
+export default function RegisterForm() {
+  const [step, setStep] = useState<1 | 2>(1);
   const [formData, setFormData] = useState<FormDataType>({
     email: "",
     password: "",
@@ -44,61 +48,53 @@ const RegisterForm = () => {
     pays: "",
     profession: "",
     tel: "",
-    poids: "",
-    taille: "",
-    medicament: "",
-    allergie: "",
-    maladie: "",
-    antecendent_chirurgicaux: "",
     ville: "",
     adress: "",
     code_postal: "",
+    poids: "",
+    taille: "",
+    antecedents: "",
     tabac: false,
     alcool: false,
-    photoFile: null,
+    photoFiles: [],
     note: "",
     date_souhaite: null,
     intervention_1_name: "",
     intervention_2_name: "",
   });
-  const [interventions, setInterventions] = useState<any[]>([]);
+
+  const [interventions, setInterventions] = useState<Intervention[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchInterventions = async () => {
       try {
-        const response = await api.get("/api/interventions?page=1");
-
-        // Vérifie si la clé 'member' existe dans la réponse et est un tableau
+        const response = await api.get("/interventions?page=1");
         if (Array.isArray(response.data.member)) {
-          setInterventions(response.data.member); // On récupère les interventions
+          setInterventions(response.data.member);
         } else {
-          console.error(
-            "La réponse de l'API n'est pas un tableau d'interventions."
-          );
-          setError("Les interventions n'ont pas pu être chargées.");
+          setError("Erreur lors du chargement des interventions.");
         }
-      } catch (error) {
-        console.error(error);
-        setError(
-          "Une erreur est survenue lors du chargement des interventions."
-        );
+      } catch (err) {
+        setError("Impossible de charger les interventions.");
+        console.error("Error fetching interventions:", err);
       }
     };
-
     fetchInterventions();
   }, []);
 
   const handleChange = (
     e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
     >
   ) => {
-    const { name, value } = e.target;
+    const { name, value, type } = e.target;
+    const checked = (e.target as HTMLInputElement).checked;
+
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: type === "checkbox" ? checked : value,
     }));
   };
 
@@ -110,11 +106,64 @@ const RegisterForm = () => {
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files ? e.target.files[0] : null;
-    setFormData((prev) => ({
-      ...prev,
-      photoFile: file,
-    }));
+    const files = e.target.files;
+    if (files) {
+      // Limite à 5 fichiers maximum
+      if (formData.photoFiles.length + files.length > 5) {
+        setError("Vous ne pouvez uploader que 5 fichiers maximum");
+        return;
+      }
+
+      // Vérification de la taille des fichiers (5MB max par fichier)
+      for (let i = 0; i < files.length; i++) {
+        if (files[i].size > 5 * 1024 * 1024) {
+          setError(
+            `Le fichier ${files[i].name} dépasse la taille maximale de 5MB`
+          );
+          return;
+        }
+      }
+
+      setFormData((prev) => ({
+        ...prev,
+        photoFiles: [...prev.photoFiles, ...Array.from(files)],
+      }));
+    }
+  };
+  const removeFile = (index: number) => {
+    setFormData((prev) => {
+      const newFiles = [...prev.photoFiles];
+      newFiles.splice(index, 1);
+      return { ...prev, photoFiles: newFiles };
+    });
+  };
+  const handleNextStep = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Validation des champs de l'étape 1 avant de continuer
+    if (
+      !formData.email ||
+      !formData.password ||
+      !formData.nom ||
+      !formData.prenom ||
+      !formData.civilite ||
+      !formData.annee_naissance ||
+      !formData.pays ||
+      !formData.profession ||
+      !formData.tel ||
+      !formData.ville ||
+      !formData.adress ||
+      !formData.code_postal
+    ) {
+      setError("Veuillez remplir tous les champs obligatoires.");
+      return;
+    }
+    setError(null);
+    setStep(2);
+  };
+
+  const handleBackStep = (e: React.FormEvent) => {
+    e.preventDefault();
+    setStep(1);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -122,513 +171,481 @@ const RegisterForm = () => {
     setIsSubmitting(true);
     setError(null);
 
-    if (formData.intervention_2_name && formData.intervention_1_name === formData.intervention_2_name) {
+    // Validation des champs de l'étape 2
+    if (
+      !formData.poids ||
+      !formData.taille ||
+      !formData.antecedents ||
+      !formData.intervention_1_name
+    ) {
+      setError("Veuillez remplir tous les champs obligatoires.");
+      setIsSubmitting(false);
+      return;
+    }
+
+    if (
+      formData.intervention_2_name &&
+      formData.intervention_1_name === formData.intervention_2_name
+    ) {
       setError("Les deux interventions doivent être différentes.");
       setIsSubmitting(false);
       return;
     }
-    const fetchInterventions = async () => {
-      try {
-        const response = await api.get("/api/interventions");
-        console.log("DATA:", response.data); // Vérifiez la structure réelle
-
-        // Essayez ces différentes possibilités
-        const data =
-          response.data.member ||
-          response.data["hydra:member"] ||
-          response.data.items ||
-          response.data;
-
-        if (Array.isArray(data)) {
-          setInterventions(data);
-        } else {
-          setError("Format des interventions invalide");
-        }
-      } catch (err) {
-        setError("Échec du chargement des interventions");
-        console.error(err);
-      }
-    };
 
     try {
-      const formDataToSend = new FormData();
-
-      // Ajoutez tous les champs existants...
-      Object.entries(formData).forEach(([key, value]) => {
-        if (key === "photoFile" && value instanceof File) {
-          formDataToSend.append(key, value);
-        } else if (key === "date_souhaite" && value instanceof Date) {
-          // Formatage spécial pour la date
-          formDataToSend.append(key, value.toISOString().split("T")[0]);
-        } else if (
-          typeof value === "string" ||
-          typeof value === "number" ||
-          typeof value === "boolean"
-        ) {
-          formDataToSend.append(key, value.toString());
-        } else if (value === null) {
-          // Pour les champs null comme date_souhaite quand non sélectionnée
-          formDataToSend.append(key, "");
-        }
-      });
-
-      const response = await api.post("/api/register", formDataToSend, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-
-      const token = response.data.token;
-      document.cookie = `BEARER=${token}; path=/; HttpOnly; Secure`;
-    } catch (err) {
-      console.error("Full error:", error);
-      setError(
-        "Une erreur est survenue lors de l'inscription. Veuillez réessayer."
-      );
-      console.log("Data being sent:", {
+      // Préparation des données pour l'API
+      const payload = {
         email: formData.email,
-        interventions: formData.intervention_1_name,
+        password: formData.password,
+        nom: formData.nom,
+        prenom: formData.prenom,
+        civilite: formData.civilite,
+        annee_naissance: parseInt(formData.annee_naissance),
+        pays: formData.pays,
+        profession: formData.profession,
+        tel: formData.tel,
+        poids: parseFloat(formData.poids),
+        taille: parseFloat(formData.taille),
+        antecedents: formData.antecedents,
+        ville: formData.ville,
+        adress: formData.adress,
+        code_postal: formData.code_postal,
         tabac: formData.tabac,
         alcool: formData.alcool,
-        photoFile: formData.photoFile?.name || "none",
+        note: formData.note,
+        date_souhaite:
+          formData.date_souhaite?.toISOString().split("T")[0] || "",
+        intervention_1_name: formData.intervention_1_name,
+        intervention_2_name: formData.intervention_2_name || null, // Envoie null si vide
+        // On n'envoie photoFiles que si il y a des fichiers
+        ...(formData.photoFiles.length > 0 && {
+          photoFiles: formData.photoFiles,
+        }),
+      };
+
+      // Création FormData seulement si besoin (fichiers présents)
+      // let headers: { 'Content-Type': string } | {} = { 
+      //   'Content-Type': 'application/json' 
+      // };
+    
+      type ApiHeaders = 
+      | { 'Content-Type': 'application/json' }
+      | Record<string, never>; // Objet vide
+    
+    let headers: ApiHeaders = { 'Content-Type': 'application/json' };
+    
+      let requestData: any = payload;
+
+      if (formData.photoFiles.length > 0) {
+        const formDataToSend = new FormData();
+        Object.entries(payload).forEach(([key, value]) => {
+          if (key === "photoFiles") {
+            (value as File[]).forEach((file) => {
+              formDataToSend.append("photoFiles", file);
+            });
+          } else if (value !== null && value !== undefined) {
+            formDataToSend.append(key, value.toString());
+          }
+        });
+        requestData = formDataToSend;
+        headers = {}; // Let the browser set Content-Type with boundary for FormData
+      }
+
+      const response = await api.post("/register", requestData, {
+        headers: headers,
       });
+
+      // Gestion de la réponse
+      if (response.data.token) {
+        document.cookie = `BEARER=${
+          response.data.token
+        }; path=/; Secure; SameSite=Strict${
+          window.location.protocol === "https:" ? "; Secure" : ""
+        }`;
+      }
+
+      alert("Inscription réussie !");
+      // window.location.href = "/dashboard"; // Redirection si nécessaire
+    } catch (err: any) {
+      console.error("Registration error:", err);
+
+      // Gestion améliorée des erreurs
+      if (err.response) {
+        if (err.response.data.violations) {
+          setError(
+            err.response.data.violations
+              .map((v: { message: string }) => v.message)
+              .join(", ")
+          );
+        } else {
+          setError(
+            err.response.data.message ||
+              err.response.data.title ||
+              "Erreur lors de l'envoi du formulaire"
+          );
+        }
+      } else {
+        setError("Erreur de connexion au serveur");
+      }
     } finally {
       setIsSubmitting(false);
     }
   };
+ 
 
   return (
-    <div className="m-20">
-      <h2 className="text-2xl font-semibold text-center">
+    <div className="max-w-3xl mx-auto p-6 mt-8 border rounded-lg shadow-md">
+      <h2 className="text-2xl font-semibold text-center mb-6">
         Inscription Patient
       </h2>
-      <form onSubmit={handleSubmit}>
-        <div className="flex flex-col">
-          <label htmlFor="email" className="text-sm font-medium">
-            Email
-          </label>
-          <input
-            type="email"
-            name="email"
-            id="email"
-            className="border rounded px-3 py-2"
-            value={formData.email}
-            onChange={handleChange}
-            required
-          />
-        </div>
 
-        <div className="flex flex-col">
-          <label htmlFor="password" className="text-sm font-medium">
-            Mot de passe
-          </label>
-          <input
-            type="password"
-            name="password"
-            id="password"
-            className="border rounded px-3 py-2"
-            value={formData.password}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        {/* Nom */}
-        <div className="flex flex-col">
-          <label htmlFor="nom" className="text-sm font-medium">
-            Nom
-          </label>
-          <input
-            type="text"
-            name="nom"
-            id="nom"
-            className="border rounded px-3 py-2"
-            value={formData.nom}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        {/* Prénom */}
-        <div className="flex flex-col">
-          <label htmlFor="prenom" className="text-sm font-medium">
-            Prénom
-          </label>
-          <input
-            type="text"
-            name="prenom"
-            id="prenom"
-            className="border rounded px-3 py-2"
-            value={formData.prenom}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        {/* Civilité */}
-        <div className="flex flex-col">
-          <label htmlFor="civilite" className="text-sm font-medium">
-            Civilité
-          </label>
-          <select
-            name="civilite"
-            id="civilite"
-            className="border rounded px-3 py-2"
-            value={formData.civilite}
-            onChange={handleChange}
-            required
-          >
-            <option value="">Sélectionner</option>
-            <option value="Mr">Monsieur</option>
-            <option value="Mme">Madame</option>
-            <option value="Mlle">Mademoiselle</option>
-          </select>
-        </div>
-
-        {/* Année de naissance */}
-        <div className="flex flex-col">
-          <label htmlFor="annee_naissance" className="text-sm font-medium">
-            Année de naissance
-          </label>
-          <input
-            type="number"
-            name="annee_naissance"
-            id="annee_naissance"
-            className="border rounded px-3 py-2"
-            value={formData.annee_naissance}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        {/* Pays */}
-        <div className="flex flex-col">
-          <label htmlFor="pays" className="text-sm font-medium">
-            Pays
-          </label>
-          <input
-            type="text"
-            name="pays"
-            id="pays"
-            className="border rounded px-3 py-2"
-            value={formData.pays}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        {/* Profession */}
-        <div className="flex flex-col">
-          <label htmlFor="profession" className="text-sm font-medium">
-            Profession
-          </label>
-          <input
-            type="text"
-            name="profession"
-            id="profession"
-            className="border rounded px-3 py-2"
-            value={formData.profession}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        {/* Téléphone */}
-        <div className="flex flex-col">
-          <label htmlFor="tel" className="text-sm font-medium">
-            Téléphone
-          </label>
-          <input
-            type="tel"
-            name="tel"
-            id="tel"
-            className="border rounded px-3 py-2"
-            value={formData.tel}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        {/* Poids */}
-        <div className="flex flex-col">
-          <label htmlFor="poids" className="text-sm font-medium">
-            Poids (kg)
-          </label>
-          <input
-            type="number"
-            name="poids"
-            id="poids"
-            className="border rounded px-3 py-2"
-            value={formData.poids}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        {/* Taille */}
-        <div className="flex flex-col">
-          <label htmlFor="taille" className="text-sm font-medium">
-            Taille (cm)
-          </label>
-          <input
-            type="number"
-            name="taille"
-            id="taille"
-            className="border rounded px-3 py-2"
-            value={formData.taille}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        {/* Médicaments */}
-        <div className="flex flex-col">
-          <label htmlFor="medicament" className="text-sm font-medium">
-            Médicaments
-          </label>
-          <input
-            type="text"
-            name="medicament"
-            id="medicament"
-            className="border rounded px-3 py-2"
-            value={formData.medicament}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        {/* Allergies */}
-        <div className="flex flex-col">
-          <label htmlFor="allergie" className="text-sm font-medium">
-            Allergies
-          </label>
-          <input
-            type="text"
-            name="allergie"
-            id="allergie"
-            className="border rounded px-3 py-2"
-            value={formData.allergie}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        {/* Maladies */}
-        <div className="flex flex-col">
-          <label htmlFor="maladie" className="text-sm font-medium">
-            Maladies
-          </label>
-          <input
-            type="text"
-            name="maladie"
-            id="maladie"
-            className="border rounded px-3 py-2"
-            value={formData.maladie}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        {/* Antécédents chirurgicaux */}
-        <div className="flex flex-col">
-          <label
-            htmlFor="antecendent_chirurgicaux"
-            className="text-sm font-medium"
-          >
-            Antécédents chirurgicaux
-          </label>
-          <input
-            type="text"
-            name="antecendent_chirurgicaux"
-            id="antecendent_chirurgicaux"
-            className="border rounded px-3 py-2"
-            value={formData.antecendent_chirurgicaux}
-            onChange={handleChange}
-          />
-        </div>
-
-        {/* Ville */}
-        <div className="flex flex-col">
-          <label htmlFor="ville" className="text-sm font-medium">
-            Ville
-          </label>
-          <input
-            type="text"
-            name="ville"
-            id="ville"
-            className="border rounded px-3 py-2"
-            value={formData.ville}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        {/* Adresse */}
-        <div className="flex flex-col">
-          <label htmlFor="adress" className="text-sm font-medium">
-            Adresse
-          </label>
-          <input
-            type="text"
-            name="adress"
-            id="adress"
-            className="border rounded px-3 py-2"
-            value={formData.adress}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        {/* Code postal */}
-        <div className="flex flex-col">
-          <label htmlFor="code_postal" className="text-sm font-medium">
-            Code Postal
-          </label>
-          <input
-            type="text"
-            name="code_postal"
-            id="code_postal"
-            className="border rounded px-3 py-2"
-            value={formData.code_postal}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        {/* Tabac */}
-        <div className="flex flex-col">
-          <label htmlFor="tabac" className="text-sm font-medium">
-            Consommez-vous du tabac ?
-          </label>
-          <input
-            type="checkbox"
-            name="tabac"
-            id="tabac"
-            className="border rounded px-3 py-2"
-            checked={formData.tabac}
-            onChange={(e) =>
-              setFormData((prev) => ({ ...prev, tabac: e.target.checked }))
-            }
-          />
-        </div>
-
-        {/* Alcool */}
-        <div className="flex flex-col">
-          <label htmlFor="alcool" className="text-sm font-medium">
-            Consommez-vous de l'alcool ?
-          </label>
-          <input
-            type="checkbox"
-            name="alcool"
-            id="alcool"
-            className="border rounded px-3 py-2"
-            checked={formData.alcool}
-            onChange={(e) =>
-              setFormData((prev) => ({ ...prev, alcool: e.target.checked }))
-            }
-          />
-        </div>
-
-        <div className="flex flex-col">
-          <label htmlFor="photo" className="text-sm font-medium">
-            Photo
-          </label>
-          <input
-            type="file"
-            name="photoFile"
-            id="photo"
-            className="border rounded px-3 py-2"
-            onChange={handleFileChange}
-          />
-        </div>
-
-        <div className="flex flex-col">
-          <label htmlFor="note" className="text-sm font-medium">
-            Note
-          </label>
-          <textarea
-            name="note"
-            id="note"
-            className="border rounded px-3 py-2"
-            value={formData.note}
-            onChange={handleChange}
-          />
-        </div>
-
-        {/* Intervention 1 */}
-        <div className="flex flex-col">
-          <label htmlFor="intervention_1_name" className="text-sm font-medium">
-            Intervention 1
-          </label>
-          <select
-            name="intervention_1_name"
-            id="intervention_1_name"
-            className="border rounded px-3 py-2"
-            value={formData.intervention_1_name}
-            onChange={handleChange}
-            required
-          >
-            <option value="">Sélectionner une intervention</option>
-            {interventions.map((intervention) => (
-              <option key={intervention["@id"]} value={intervention.name}>
-                {intervention.name}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Intervention 2 */}
-        <div className="flex flex-col">
-          <label htmlFor="intervention_2_name" className="text-sm font-medium">
-            Intervention 2
-          </label>
-          <select
-            name="intervention_2_name"
-            id="intervention_2_name"
-            className="border rounded px-3 py-2"
-            value={formData.intervention_2_name}
-            onChange={handleChange}
-          >
-            <option value="">Sélectionner une intervention</option>
-            {interventions
-              .filter(
-                (intervention) =>
-                  intervention.name !== formData.intervention_1_name
-              ) // Exclure l'intervention déjà choisie
-              .map((intervention) => (
-                <option key={intervention["@id"]} value={intervention.name}>
-                  {intervention.name}
-                </option>
-              ))}
-          </select>
-        </div>
-
-        <div className="flex flex-col">
-          <DatePickerField
-            className="text-sm font-medium"
-            id="date_souhaite"
-            name="date_souhaite"
-            label="Date souhaitée pour l'intervention"
-            selected={formData.date_souhaite}
-            onChange={handleDateChange}
-          />
-        </div>
-        {/* Bouton d'envoi */}
-        <button
-          type="submit"
-          className={`w-full py-2 bg-blue-500 text-white rounded ${
-            isSubmitting ? "opacity-50" : ""
+      {/* Indicateur d'étape */}
+      <div className="flex mb-6">
+        <div
+          className={`flex-1 text-center py-2 border-b-2 ${
+            step === 1 ? "border-blue-600 font-medium" : "border-gray-300"
           }`}
-          disabled={isSubmitting}
         >
-          {isSubmitting ? "Envoi en cours..." : "S'inscrire"}
-        </button>
+          Étape 1: Informations personnelles
+        </div>
+        <div
+          className={`flex-1 text-center py-2 border-b-2 ${
+            step === 2 ? "border-blue-600 font-medium" : "border-gray-300"
+          }`}
+        >
+          Étape 2: Informations médicales
+        </div>
+      </div>
 
-        {/* Affichage des erreurs */}
-        {error && <p className="text-red-500 text-center">{error}</p>}
+      <form
+        onSubmit={step === 1 ? handleNextStep : handleSubmit}
+        className="space-y-4"
+      >
+        {step === 1 && (
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <input
+                  name="email"
+                  type="email"
+                  placeholder="Email *"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                  className="w-full p-2 border rounded"
+                />
+              </div>
+              <div className="space-y-1">
+                <input
+                  type="password"
+                  name="password"
+                  placeholder="Mot de passe *"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                  minLength={6}
+                  className="w-full p-2 border rounded"
+                />
+              </div>
+              <div className="space-y-1">
+                <input
+                  name="nom"
+                  placeholder="Nom *"
+                  value={formData.nom}
+                  onChange={handleChange}
+                  required
+                  className="w-full p-2 border rounded"
+                />
+              </div>
+              <div className="space-y-1">
+                <input
+                  name="prenom"
+                  placeholder="Prénom *"
+                  value={formData.prenom}
+                  onChange={handleChange}
+                  required
+                  className="w-full p-2 border rounded"
+                />
+              </div>
+              <div className="space-y-1">
+                <select
+                  name="civilite"
+                  value={formData.civilite}
+                  onChange={handleChange}
+                  required
+                  className="w-full p-2 border rounded"
+                >
+                  <option value="">Civilité *</option>
+                  <option value="Mr">Monsieur</option>
+                  <option value="Mme">Madame</option>
+                  <option value="Mlle">Mademoiselle</option>
+                </select>
+              </div>
+              <div className="space-y-1">
+                <input
+                  name="annee_naissance"
+                  type="number"
+                  placeholder="Année de naissance *"
+                  value={formData.annee_naissance}
+                  onChange={handleChange}
+                  required
+                  min={1900}
+                  max={new Date().getFullYear()}
+                  className="w-full p-2 border rounded"
+                />
+              </div>
+              <div className="space-y-1">
+                <input
+                  name="pays"
+                  placeholder="Pays *"
+                  value={formData.pays}
+                  onChange={handleChange}
+                  required
+                  className="w-full p-2 border rounded"
+                />
+              </div>
+              <div className="space-y-1">
+                <input
+                  name="profession"
+                  placeholder="Profession *"
+                  value={formData.profession}
+                  onChange={handleChange}
+                  required
+                  className="w-full p-2 border rounded"
+                />
+              </div>
+              <div className="space-y-1">
+                <input
+                  name="tel"
+                  type="tel"
+                  placeholder="Téléphone *"
+                  value={formData.tel}
+                  onChange={handleChange}
+                  required
+                  className="w-full p-2 border rounded"
+                />
+              </div>
+              <div className="space-y-1">
+                <input
+                  name="ville"
+                  placeholder="Ville *"
+                  value={formData.ville}
+                  onChange={handleChange}
+                  required
+                  className="w-full p-2 border rounded"
+                />
+              </div>
+              <div className="space-y-1 col-span-2">
+                <input
+                  name="adress"
+                  placeholder="Adresse *"
+                  value={formData.adress}
+                  onChange={handleChange}
+                  required
+                  className="w-full p-2 border rounded"
+                />
+              </div>
+              <div className="space-y-1">
+                <input
+                  name="code_postal"
+                  placeholder="Code postal *"
+                  value={formData.code_postal}
+                  onChange={handleChange}
+                  required
+                  className="w-full p-2 border rounded"
+                />
+              </div>
+            </div>
+            <div className="flex justify-end mt-6">
+              <button
+                type="submit"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded transition-colors"
+              >
+                Étape suivante
+              </button>
+            </div>
+          </>
+        )}
+
+        {step === 2 && (
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <input
+                  name="poids"
+                  type="number"
+                  step="0.1"
+                  min="30"
+                  placeholder="Poids (kg) *"
+                  value={formData.poids}
+                  onChange={handleChange}
+                  required
+                  className="w-full p-2 border rounded"
+                />
+              </div>
+              <div className="space-y-1">
+                <input
+                  name="taille"
+                  type="number"
+                  step="0.1"
+                  min="100"
+                  placeholder="Taille (cm) *"
+                  value={formData.taille}
+                  onChange={handleChange}
+                  required
+                  className="w-full p-2 border rounded"
+                />
+              </div>
+              <div className="space-y-1 col-span-2">
+                <textarea
+                  name="antecedents"
+                  placeholder="Nombre de grossesses : --- Type D’accouchement : --- Date dernier accouchement : --- Date dernier allaitement : --- Traitement en cours : --- Allergies (type + traitement)"
+                  value={formData.antecedents}
+                  onChange={handleChange}
+                  required
+                  rows={4}
+                  className="w-full p-2 border rounded"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="flex items-center gap-2 p-2">
+                  <input
+                    type="checkbox"
+                    name="tabac"
+                    checked={formData.tabac}
+                    onChange={handleChange}
+                    className="h-4 w-4"
+                  />
+                  Tabac
+                </label>
+              </div>
+              <div className="space-y-1">
+                <label className="flex items-center gap-2 p-2">
+                  <input
+                    type="checkbox"
+                    name="alcool"
+                    checked={formData.alcool}
+                    onChange={handleChange}
+                    className="h-4 w-4"
+                  />
+                  Alcool
+                </label>
+              </div>
+              <div className="space-y-1 col-span-2">
+                <label className="block mb-1">
+                  Photos ( 4 photos obligatoires (une photo de chaque côté) * )
+                </label>
+                <input
+                  type="file"
+                  name="photoFiles"
+                  onChange={handleFileChange}
+                  accept="image/*"
+                  multiple
+                  className="w-full p-2 border rounded"
+                />
+
+                {/* Aperçu des fichiers sélectionnés */}
+                {formData.photoFiles.length > 0 && (
+                  <div className="mt-2 space-y-2">
+                    <p className="text-sm text-gray-600">
+                      Fichiers sélectionnés:
+                    </p>
+                    <ul className="space-y-1">
+                      {formData.photoFiles.map((file, index) => (
+                        <li
+                          key={index}
+                          className="flex items-center justify-between p-2 bg-gray-50 rounded"
+                        >
+                          <span className="truncate">{file.name}</span>
+                          <button
+                            type="button"
+                            onClick={() => removeFile(index)}
+                            className="text-red-500 hover:text-red-700"
+                          >
+                            ×
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+              <div className="space-y-1 col-span-2">
+                <textarea
+                  name="note"
+                  placeholder="Note (optionnel)"
+                  value={formData.note}
+                  onChange={handleChange}
+                  rows={3}
+                  className="w-full p-2 border rounded"
+                />
+              </div>
+              <div className="space-y-1">
+                <select
+                  name="intervention_1_name"
+                  value={formData.intervention_1_name}
+                  onChange={handleChange}
+                  required
+                  className="w-full p-2 border rounded"
+                >
+                  <option value="">Intervention 1 *</option>
+                  {interventions.map((i) => (
+                    <option key={i["@id"]} value={i.name}>
+                      {i.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="space-y-1">
+                <select
+                  name="intervention_2_name"
+                  value={formData.intervention_2_name}
+                  onChange={handleChange}
+                  className="w-full p-2 border rounded"
+                >
+                  <option value="">Intervention 2 (optionnel)</option>
+                  {interventions
+                    .filter((i) => i.name !== formData.intervention_1_name)
+                    .map((i) => (
+                      <option key={i["@id"]} value={i.name}>
+                        {i.name}
+                      </option>
+                    ))}
+                </select>
+              </div>
+              <div className="col-span-2 space-y-1">
+                <DatePickerField
+                  name="date_souhaite"
+                  id="date_souhaite"
+                  label="Date souhaitée (optionnel)"
+                  selected={formData.date_souhaite}
+                  onChange={handleDateChange}
+                />
+              </div>
+            </div>
+            <div className="flex justify-between mt-6">
+              <button
+                onClick={handleBackStep}
+                className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded transition-colors"
+              >
+                Retour
+              </button>
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isSubmitting ? "Envoi en cours..." : "S'inscrire"}
+              </button>
+            </div>
+          </>
+        )}
+        {error && (
+          <div className="p-4 text-red-600 bg-red-50 rounded-md mt-4 text-center">
+            {error}
+          </div>
+        )}
       </form>
     </div>
   );
-};
-
-export default RegisterForm;
+}
