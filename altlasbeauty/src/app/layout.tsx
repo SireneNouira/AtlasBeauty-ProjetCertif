@@ -1,16 +1,35 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+// import { Playfair_Display, Lora } from 'next/font/google';
+import { Lato, Crimson_Text } from 'next/font/google';
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+// Définir les polices avec des variables CSS
+// const playfair = Playfair_Display({
+//   subsets: ['latin'],
+//   weight: ['400', '600', '700'],
+//   variable: '--font-playfair',
+//   display: 'swap',
+// });
+const lato = Lato({
+  subsets: ['latin'],
+  weight: ['400', '700', '900'],
+  variable: '--font-lato',
+  display: 'swap',
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+// Texte → Crimson Text
+const crimson = Crimson_Text({
+  subsets: ['latin'],
+  weight: ['400', '600', '700'],
+  variable: '--font-crimson',
+  display: 'swap',
 });
+// const lora = Lora({
+//   subsets: ['latin'],
+//   weight: ['400', '500', '600', '700'],
+//   variable: '--font-lora',
+//   display: 'swap',
+// });
 
 export const metadata: Metadata = {
   title: "AtlasBeauty",
@@ -23,12 +42,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
-      </body>
+    <html lang="fr" className={`${lato.variable} ${crimson.variable}`}>
+      
+      <body className="font-body">{children}</body>
     </html>
   );
 }
