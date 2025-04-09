@@ -23,7 +23,7 @@ function Interventions() {
     const current = carouselRef.current;
     if (current) {
       current.addEventListener("scroll", handleScroll);
-      handleScroll(); // Init
+      handleScroll();
     }
 
     return () => {
@@ -31,7 +31,6 @@ function Interventions() {
     };
   }, []);
 
-  // Souris
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!carouselRef.current) return;
     setIsDragging(true);
@@ -49,7 +48,6 @@ function Interventions() {
     carouselRef.current.scrollLeft = scrollLeft - walk;
   };
 
-  // Tactile
   const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
     if (!carouselRef.current) return;
     setTouchStartX(e.touches[0].clientX);
@@ -65,15 +63,12 @@ function Interventions() {
 
   const scroll = (direction: "left" | "right") => {
     if (!carouselRef.current) return;
-
     const container = carouselRef.current;
     const children = Array.from(container.children) as HTMLElement[];
     const scrollLeft = container.scrollLeft;
     const containerWidth = container.clientWidth;
 
-    // Trouver l'élément vers lequel on veut scroller
     let target: HTMLElement | undefined;
-
     if (direction === "right") {
       target = children.find((child) => child.offsetLeft > scrollLeft + 10);
     } else {
@@ -139,15 +134,15 @@ function Interventions() {
       description: ["Injection", "Mésolift", "Peeling", "Hypersudation"],
     },
   ];
+
   return (
     <section className="mt-12 pb-16">
       <div className="flex flex-col ml-16">
-        <div className="w-2/3 h-12 bg-pink-100  flex items-center rounded">
+        <div className="w-2/3 h-12 bg-pink-100 flex items-center rounded">
           <p className="ml-44 font-bold text-lg">
             Les interventions que nous pratiquons
           </p>
         </div>
-
         <div className="ml-36 w-52 h-9 bg-blue-500 rounded flex justify-center items-center font-bold -mt-1.5">
           <h2 className="text-white text-xl">Les interventions</h2>
         </div>
@@ -155,13 +150,11 @@ function Interventions() {
 
       <div className="w-[150px] h-0.5 bg-blue-400 mt-20 ml-32 mb-1"></div>
 
-      {/* carroussel */}
-
       <div className="relative w-full overflow-hidden">
         {showLeftArrow && (
           <button
             onClick={() => scroll("left")}
-            className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white shadow p-2 z-10 rounded-full"
+            className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white shadow p-2 z-10 rounded-full hover:scale-110 transition-transform duration-300"
           >
             <ChevronLeft />
           </button>
@@ -169,7 +162,7 @@ function Interventions() {
         {showRightArrow && (
           <button
             onClick={() => scroll("right")}
-            className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white shadow p-2 z-10 rounded-full"
+            className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white shadow p-2 z-10 rounded-full hover:scale-110 transition-transform duration-300"
           >
             <ChevronRight />
           </button>
@@ -183,13 +176,13 @@ function Interventions() {
           onMouseMove={handleMouseMove}
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
-          className={`flex  overflow-x-scroll scroll-smooth p-8 cursor-${
+          className={`flex overflow-x-scroll scroll-smooth p-8 cursor-${
             isDragging ? "grabbing" : "grab"
-          } pl-[10vw] `}
+          } pl-[10vw] gap-8`}
           style={{
             scrollSnapType: "x mandatory",
-            scrollbarWidth: "none", // Firefox
-            msOverflowStyle: "none", // IE 10+
+            scrollbarWidth: "none",
+            msOverflowStyle: "none",
           }}
         >
           <style jsx>{`
@@ -200,33 +193,33 @@ function Interventions() {
           {articles.map((article, index) => (
             <article
               key={index}
-              className="border border-gray-300 flex justify-between items-start w-[60%] min-w-[60%] py-5 px-10 bg-white scroll-snap-align-start select-none"
+              className="flex justify-between items-start w-[60%] min-w-[60%] p-6 bg-white rounded-2xl shadow-md scroll-snap-align-start select-none transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:scale-[1.02]"
             >
               <div className="flex flex-col w-1/2">
-                <p className="font-semibold text-lg">{article.title}</p>
-                <div className="w-[65px] h-1 bg-blue-500 mb-10"></div>
-                <p className="mb-6 ml-10">
+                <p className="font-semibold text-xl mb-2">{article.title}</p>
+                <div className="w-[65px] h-1 bg-blue-500 mb-6"></div>
+                <div className="mb-6 ml-4 text-gray-700">
                   {article.description.map((line, i) => (
-                    <span key={i}>
-                      {line} <br />
-                    </span>
+                    <p key={i} className="mb-1">
+                      • {line}
+                    </p>
                   ))}
-                </p>
+                </div>
                 <div className="flex gap-4">
-                  <button className="bg-blue-500 hover:bg-pink-200 text-white px-3 py-0.5 rounded-4xl font-bold">
+                  <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-1 rounded-full font-semibold transition duration-300 hover:scale-105">
                     + infos
                   </button>
-                  <button className="bg-blue-500 hover:bg-pink-200 text-white px-3 py-0.5 rounded-4xl font-bold">
+                  <button className="bg-pink-400 hover:bg-pink-500 text-white px-4 py-1 rounded-full font-semibold transition duration-300 hover:scale-105">
                     Consultation Gratuite
                   </button>
                 </div>
               </div>
-              <div className="w-1/2 flex justify-end">
+              <div className="w-1/2 flex justify-end items-center">
                 <img
                   src={article.image}
                   alt={article.title}
                   draggable={false}
-                  className="select-none w-[300px] h-[250px] object-cover p-3.5"
+                  className="rounded-xl shadow-sm w-[300px] h-[250px] object-cover transition-transform duration-300 "
                 />
               </div>
             </article>
