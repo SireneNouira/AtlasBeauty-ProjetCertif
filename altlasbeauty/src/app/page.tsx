@@ -4,6 +4,9 @@ import { useEffect, useRef, useState } from "react";
 import Header from "@/components/common/Header";
 import Accueil from "@/components/sections/Accueil";
 import Interventions from "@/components/sections/Interventions";
+import Sejour from "@/components/sections/Sejour";
+import Chirurgiens from "@/components/sections/Chirurgiens";
+import Footer from "@/components/common/Footer";
 
 export default function Home() {
   const accueilRef = useRef(null);
@@ -38,6 +41,9 @@ export default function Home() {
         <Accueil />
       </div>
       <Interventions />
+      <Sejour />
+      <Chirurgiens />
+      <Footer />
     </>
   );
 }

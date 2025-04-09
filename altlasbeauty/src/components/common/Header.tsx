@@ -9,7 +9,7 @@ function Header({ isTransparent = false }) {
       isTransparent ? "" : "shadow-md z-50"
     }`}
     >
-      <Image src="/logo.png" alt="AtlasBeauty" width={120} height={20} />
+      <Image src="/atlas/logo.png" alt="AtlasBeauty" width={120} height={20} />
       <div className="flex items-center gap-6">
         <div className="flex items-center gap-2">
           <a
@@ -44,7 +44,7 @@ function Header({ isTransparent = false }) {
             <span className="text-lg font-medium">+216 52 86 96 96</span>
           </p>
         </div>
-        <button className="flex items-center gap-2 text-lg font-medium hover:text-blue-400 bg-blue-500 hover:bg-blue-700 text-white py-1 px-3  rounded-lg">
+        <button className="flex items-center gap-2 text-lg font-medium hover:text-blue-700 bg-blue-500 hover:bg-blue-400 text-white py-1 px-3  rounded-lg">
           Interventions <FiChevronDown size={20} />
         </button>
 
