@@ -2,6 +2,8 @@ import React from "react";
 import Image from "next/image";
 import { FaInstagram, FaFacebookF, FaWhatsapp } from "react-icons/fa";
 import { FiChevronDown } from "react-icons/fi";
+import Link from "next/link";
+
 type HeaderProps = {
   isTransparent?: boolean;
   onTogglePresentation?: () => void;
@@ -66,9 +68,9 @@ function Header({ isTransparent = false, onTogglePresentation }: HeaderProps) {
           Tarifs
         </button>
 
-        <button className="text-md font-semibold text-blue-700 hover:text-blue-900 transition px-3 py-2 rounded-xl hover:bg-white/50">
+        <Link href="/espacePerso" className="text-md font-semibold text-blue-700 hover:text-blue-900 transition px-3 py-2 rounded-xl hover:bg-white/50">
           Espace Perso
-        </button>
+        </Link>
       </div>
     </header>
   );

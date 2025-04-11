@@ -8,6 +8,7 @@ export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
@@ -27,7 +28,10 @@ export default function LoginForm() {
       if (response.data.message === "Connexion réussie") {
         // Rediriger en fonction du type d'utilisateur
         if (response.data.userType === "Patient") {
-          router.push("/");
+        router.refresh(); 
+         router.push("/espacePerso");
+          
+
         } else if (response.data.userType === "User") {
           router.push("/");
         } else {

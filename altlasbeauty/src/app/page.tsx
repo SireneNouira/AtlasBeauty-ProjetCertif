@@ -9,6 +9,7 @@ import Sejour from "@/components/sections/Sejour";
 import Chirurgiens from "@/components/sections/Chirurgiens";
 import Footer from "@/components/common/Footer";
 import PresentationIntervention from "@/components/PresentationIntervention";
+import Chatbot from "@/components/Chatbot";
 
 export default function Home() {
   const accueilRef = useRef(null);
@@ -51,6 +52,7 @@ export default function Home() {
 
   return (
     <>
+     <Chatbot />
       <Header
         isTransparent={isAccueilVisible}
         onTogglePresentation={() => setShowPresentation((prev) => !prev)}
