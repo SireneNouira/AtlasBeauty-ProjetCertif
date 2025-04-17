@@ -52,7 +52,6 @@ export default function Home() {
 
   return (
     <>
-     <Chatbot />
       <Header
         isTransparent={isAccueilVisible}
         onTogglePresentation={() => setShowPresentation((prev) => !prev)}

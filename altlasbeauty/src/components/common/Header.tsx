@@ -3,6 +3,7 @@ import Image from "next/image";
 import { FaInstagram, FaFacebookF, FaWhatsapp } from "react-icons/fa";
 import { FiChevronDown } from "react-icons/fi";
 import Link from "next/link";
+import { useAuth } from '@/hooks/useAuth'
 
 type HeaderProps = {
   isTransparent?: boolean;
@@ -10,6 +11,8 @@ type HeaderProps = {
 };
 
 function Header({ isTransparent = false, onTogglePresentation }: HeaderProps) {
+  const { isAuthenticated, loading } = useAuth()
+
   return (
     <header
     className={`fixed top-0 left-0 w-full flex justify-between items-center px-32 py-4 bg-pink-100 h-25 transition-all duration-300 ${
@@ -60,15 +63,15 @@ function Header({ isTransparent = false, onTogglePresentation }: HeaderProps) {
           Interventions <FiChevronDown size={18} />
         </button>
 
-        <button className="text-md font-semibold text-blue-700 hover:text-blue-900 transition px-3 py-2 rounded-xl hover:bg-white/50">
+        <Link  href="/auth?action=register"  className="text-md font-semibold text-blue-700 hover:text-blue-900 transition px-3 py-2 rounded-xl hover:bg-white/50">
           Devis Gratuit
-        </button>
+        </Link>
 
         <button className="text-md font-semibold text-blue-700 hover:text-blue-900 transition px-3 py-2 rounded-xl hover:bg-white/50">
           Tarifs
         </button>
 
-        <Link href="/espacePerso" className="text-md font-semibold text-blue-700 hover:text-blue-900 transition px-3 py-2 rounded-xl hover:bg-white/50">
+        <Link href={isAuthenticated ? "/espacePerso" : "/auth"}  className="text-md font-semibold text-blue-700 hover:text-blue-900 transition px-3 py-2 rounded-xl hover:bg-white/50">
           Espace Perso
         </Link>
       </div>
