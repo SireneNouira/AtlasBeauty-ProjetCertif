@@ -30,7 +30,9 @@ use Symfony\Component\Serializer\Attribute\Groups;
 #[ApiResource(
     normalizationContext: ['groups' => ['patient:read']],
     operations: [
+        new Get(),
         new Get(
+            name: 'me',
             security: "is_granted('PATIENT_VIEW', object)",
             uriTemplate: '/me',
             provider: MeProvider::class,
@@ -137,22 +139,6 @@ class Patient implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['patient:write', 'patient:read', 'patient:update'])]
     private ?bool $alcool = null;
 
-    // #[Groups(['patient:write', 'patient:read', 'patient:update'])]
-    // #[ORM\Column(type: Types::TEXT, nullable: true)]
-    // private ?string $medicament = null;
-
-    // #[Groups(['patient:write', 'patient:read', 'patient:update'])]
-    // #[ORM\Column(length: 255, nullable: true)]
-    // private ?string $allergie = null;
-
-    // #[Groups(['patient:write', 'patient:read', 'patient:update'])]
-    // #[ORM\Column(length: 255, nullable: true)]
-    // private ?string $maladie = null;
-
-    // #[Groups(['patient:write', 'patient:read', 'patient:update'])]
-    // #[ORM\Column(type: Types::TEXT, nullable: true)]
-    // private ?string $antecendent_chirurgicaux = null;
-
     #[Groups(['patient:write', 'patient:read', 'patient:update'])]
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $antecedents = null;
@@ -171,11 +157,11 @@ class Patient implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToOne(mappedBy: 'patient', cascade: ['persist', 'remove'])]
     private ?Devis $devis = null;
 
-    #[ORM\OneToMany(mappedBy: 'senderUser', targetEntity: Message::class)]
-private Collection $sentMessages;
-
-#[ORM\OneToMany(mappedBy: 'receiverUser', targetEntity: Message::class)]
-private Collection $receivedMessages;
+    #[ORM\OneToMany(mappedBy: 'senderPatient', targetEntity: Message::class)]
+    private Collection $sentMessages;
+    
+    #[ORM\OneToMany(mappedBy: 'receiverPatient', targetEntity: Message::class)]
+    private Collection $receivedMessages;
 
 
     public function __construct()
@@ -427,54 +413,6 @@ private Collection $receivedMessages;
 
         return $this;
     }
-
-    // public function getMedicament(): ?string
-    // {
-    //     return $this->medicament;
-    // }
-
-    // public function setMedicament(?string $medicament): static
-    // {
-    //     $this->medicament = $medicament;
-
-    //     return $this;
-    // }
-
-    // public function getAllergie(): ?string
-    // {
-    //     return $this->allergie;
-    // }
-
-    // public function setAllergie(?string $allergie): static
-    // {
-    //     $this->allergie = $allergie;
-
-    //     return $this;
-    // }
-
-    // public function getMaladie(): ?string
-    // {
-    //     return $this->maladie;
-    // }
-
-    // public function setMaladie(?string $maladie): static
-    // {
-    //     $this->maladie = $maladie;
-
-    //     return $this;
-    // }
-
-    // public function getAntecendentChirurgicaux(): ?string
-    // {
-    //     return $this->antecendent_chirurgicaux;
-    // }
-
-    // public function setAntecendentChirurgicaux(?string $antecendent_chirurgicaux): static
-    // {
-    //     $this->antecendent_chirurgicaux = $antecendent_chirurgicaux;
-
-    //     return $this;
-    // }
     public function getAntecedents(): ?string
     {
         return $this->antecedents;
@@ -567,4 +505,32 @@ private Collection $receivedMessages;
 
         return $this;
     }
+
+    public function getSentMessages(): Collection
+{
+    return $this->sentMessages;
+}
+
+public function addSentMessage(Message $message): self
+{
+    if (!$this->sentMessages->contains($message)) {
+        $this->sentMessages[] = $message;
+        $message->setSenderPatient($this);
+    }
+    return $this;
+}
+
+public function getReceivedMessages(): Collection
+{
+    return $this->receivedMessages;
+}
+
+public function addReceivedMessage(Message $message): self
+{
+    if (!$this->receivedMessages->contains($message)) {
+        $this->receivedMessages[] = $message;
+        $message->setReceiverPatient($this);
+    }
+    return $this;
+}
 }

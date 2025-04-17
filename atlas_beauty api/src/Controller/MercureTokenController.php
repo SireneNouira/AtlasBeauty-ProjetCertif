@@ -6,6 +6,8 @@ use Firebase\JWT\JWT;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
+use App\Entity\User;
+use App\Entity\Patient;
 
 class MercureTokenController extends AbstractController
 {
@@ -13,24 +15,32 @@ class MercureTokenController extends AbstractController
     public function __invoke(): JsonResponse
     {
         $user = $this->getUser();
+        $topics = [];
 
-        /**
-         * @var User $user
-         */
-        $userId = $user->getId();
-        $topics = [
-            "http://example.com/chat/user-$userId",
-            "http://example.com/chat/patient-$userId", // au cas où tu veux gérer les 2 types
-        ];
+        // Si l'utilisateur est un User normal
+        if ($user instanceof User) {
+            $topics[] = "http://example.com/chat/user-{$user->getId()}";
+            
+            // Ajoutez ici d'autres topics spécifiques aux Users si nécessaire
+        }
+        // Si l'utilisateur est un Patient
+        elseif ($user instanceof Patient) {
+            $topics[] = "http://example.com/chat/patient-{$user->getId()}";
+            
+            // Ajoutez ici d'autres topics spécifiques aux Patients si nécessaire
+        }
 
         $payload = [
             'mercure' => [
-                'subscribe' => $topics
+                'subscribe' => $topics,
+                'publish' => $topics // Permet aussi de publier sur ces topics
             ],
             'exp' => (new \DateTimeImmutable('+1 hour'))->getTimestamp()
         ];
 
-        $jwt = JWT::encode($payload, '311021', 'HS256');
+        // Utilisez la clé Mercure depuis l'environnement
+        $jwtSecret = $this->getParameter('mercure_jwt_secret');
+        $jwt = JWT::encode($payload, $jwtSecret, 'HS256');
 
         return $this->json(['token' => $jwt]);
     }

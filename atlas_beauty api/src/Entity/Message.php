@@ -7,6 +7,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use App\Entity\Patient;
 use App\Entity\User;
+use App\State\MessageProcessor;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Mercure\Attribute\Publish;
@@ -15,11 +16,24 @@ use Symfony\Component\Mercure\Attribute\Publish;
 
 #[ORM\Entity]
 #[ApiResource(
-    operations: [new GetCollection(), new Post()],
+    operations: [
+        new GetCollection(),
+        new Post(
+            processor: MessageProcessor::class, // Nous allons créer ce processeur
+            mercure: [
+                'topics' => [
+                    // 'http://example.com/messages/{receiverUser}/{receiverPatient}', // Nous allons gérer cela dynamiquement
+                    // 'http://example.com/messages/{senderUser}/{senderPatient}'
+                    '/api/messages/{id}',
+                    '/chat/user/{receiverUser.id}',
+                    '/chat/patient/{senderPatient.id}'
+                ]
+            ]
+        )
+    ],
     normalizationContext: ['groups' => ['message:read']],
     denormalizationContext: ['groups' => ['message:write']]
 )]
-// #[Publish] // ✅ C’est le bon attribut maintenant
 class Message
 {
     #[ORM\Id, ORM\GeneratedValue, ORM\Column]
@@ -34,7 +48,11 @@ class Message
     #[Groups(['message:read'])]
     private \DateTimeImmutable $createdAt;
 
-    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\ManyToOne(targetEntity: User::class)] // Retirez cascade persist
+    #[Groups(['message:read', 'message:write'])]
+    private ?User $receiverUser = null;
+    
+    #[ORM\ManyToOne(targetEntity: User::class)] // Retirez cascade persist
     #[Groups(['message:read', 'message:write'])]
     private ?User $senderUser = null;
 
@@ -42,9 +60,6 @@ class Message
     #[Groups(['message:read', 'message:write'])]
     private ?Patient $senderPatient = null;
 
-    #[ORM\ManyToOne(targetEntity: User::class)]
-    #[Groups(['message:read', 'message:write'])]
-    private ?User $receiverUser = null;
 
     #[ORM\ManyToOne(targetEntity: Patient::class)]
     #[Groups(['message:read', 'message:write'])]
