@@ -8,6 +8,7 @@ use Symfony\Component\Serializer\Encoder\DecoderInterface;
 class MultipartFormDataDecoder implements DecoderInterface
 {
     private const FORMAT = 'multipart';
+    
 
     /**
      * Définition des types attendus pour chaque champ du DTO

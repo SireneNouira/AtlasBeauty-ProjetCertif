@@ -1,6 +1,10 @@
 security:
   password_hashers:
     Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: "auto"
+  role_hierarchy:
+      ROLE_ADMIN:   [ROLE_ASSISTANT, ROLE_USER]
+      ROLE_ASSISTANT: [ROLE_USER]
+
 
   providers:
     chain_provider:
@@ -36,14 +40,16 @@ security:
     api:
       pattern: ^/api
       stateless: true
-      jwt: ~
       provider: chain_provider
+      jwt: ~
+
     admin:
       pattern: ^/admin
       stateless: true
+      provider: chain_provider 
       jwt: ~
-      provider: chain_provider # Utilisation de JWT pour l'authentification de l'admin
-      # Accès restreint aux admins uniquement
+      logout:
+        path: /admin/logout  
 
     main:
       lazy: true
@@ -51,6 +57,10 @@ security:
       logout:
         path: api/logout
         invalidate_session: false
+      stateless: true
+      # jwt:
+      #     cookie_extractors:
+      #         - App\Security\JwtCookieExtractor
 
   access_control:
     - { path: ^/api/login, roles: PUBLIC_ACCESS }
@@ -68,7 +78,13 @@ security:
       }
     - { path: ^/api/register, roles: PUBLIC_ACCESS }
     - { path: ^/api/patients, methods: [GET], roles: ROLE_ADMIN }
+    - { path: ^/api/me, roles: PUBLIC_ACCESS }
 
+    - { path: ^/docs, roles: PUBLIC_ACCESS }
+    - { path: ^/api/mercure-token, roles: IS_AUTHENTICATED_FULLY }
+
+    - { path: ^/admin, roles: ROLE_ADMIN }
+  
 when@test:
   security:
     password_hashers:

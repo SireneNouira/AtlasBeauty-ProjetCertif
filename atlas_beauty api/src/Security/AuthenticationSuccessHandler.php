@@ -39,9 +39,14 @@ class AuthenticationSuccessHandler implements AuthenticationSuccessHandlerInterf
         $jwt = $this->jwtManager->create($user);
 
         // Créer un cookie HttpOnly avec le JWT
-        $response = new JsonResponse(['message' => 'Connexion réussie', 'userType' => $userType]);
-        $response->headers->setCookie(
-            new Cookie('BEARER', $jwt, 0, '/', null, true, true, false, 'Strict') // HttpOnly et Secure
+        $response = new JsonResponse([
+            'token' => $jwt,
+            'message' => 'Connexion réussie',
+            'userType' => $userType,
+        ]);
+                $response->headers->setCookie(
+             new Cookie('BEARER', $jwt, 0, '/', null, false, true, false, 'Strict') // a enlever pour la mise en prod 
+            // new Cookie('BEARER', $jwt, 0, '/', null, true, true, false, 'Strict') // HttpOnly et Secure ajouter pour la mise en prod
         );
 
         return $response;

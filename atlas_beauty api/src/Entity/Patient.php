@@ -10,11 +10,16 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use App\DataPersister\PatientDataPersister;
 use App\Dto\PatientGlobalDto;
+use App\Entity\Message as Message;
 use App\Repository\PatientRepository;
+use App\State\MeProvider as MeProvider;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Dom\Text;
+
+use Symfony\Component\Mime\Message as MimeMessage;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -26,7 +31,9 @@ use Symfony\Component\Serializer\Attribute\Groups;
     normalizationContext: ['groups' => ['patient:read']],
     operations: [
         new Get(
-            security: "is_granted('PATIENT_VIEW', object)"
+            security: "is_granted('PATIENT_VIEW', object)",
+            uriTemplate: '/me',
+            provider: MeProvider::class,
         ),
         new GetCollection(
             security: "is_granted('ROLE_ADMIN')"
@@ -130,21 +137,25 @@ class Patient implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['patient:write', 'patient:read', 'patient:update'])]
     private ?bool $alcool = null;
 
+    // #[Groups(['patient:write', 'patient:read', 'patient:update'])]
+    // #[ORM\Column(type: Types::TEXT, nullable: true)]
+    // private ?string $medicament = null;
+
+    // #[Groups(['patient:write', 'patient:read', 'patient:update'])]
+    // #[ORM\Column(length: 255, nullable: true)]
+    // private ?string $allergie = null;
+
+    // #[Groups(['patient:write', 'patient:read', 'patient:update'])]
+    // #[ORM\Column(length: 255, nullable: true)]
+    // private ?string $maladie = null;
+
+    // #[Groups(['patient:write', 'patient:read', 'patient:update'])]
+    // #[ORM\Column(type: Types::TEXT, nullable: true)]
+    // private ?string $antecendent_chirurgicaux = null;
+
     #[Groups(['patient:write', 'patient:read', 'patient:update'])]
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    private ?string $medicament = null;
-
-    #[Groups(['patient:write', 'patient:read', 'patient:update'])]
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $allergie = null;
-
-    #[Groups(['patient:write', 'patient:read', 'patient:update'])]
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $maladie = null;
-
-    #[Groups(['patient:write', 'patient:read', 'patient:update'])]
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
-    private ?string $antecendent_chirurgicaux = null;
+    private ?string $antecedents = null;
 
     #[ORM\OneToMany(mappedBy: "patient", targetEntity: Photo::class, cascade: ["persist", "remove"])]
     private Collection $photos;
@@ -160,10 +171,19 @@ class Patient implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToOne(mappedBy: 'patient', cascade: ['persist', 'remove'])]
     private ?Devis $devis = null;
 
+    #[ORM\OneToMany(mappedBy: 'senderUser', targetEntity: Message::class)]
+private Collection $sentMessages;
+
+#[ORM\OneToMany(mappedBy: 'receiverUser', targetEntity: Message::class)]
+private Collection $receivedMessages;
+
+
     public function __construct()
     {
         $this->photos = new ArrayCollection();
         $this->demandeDevis = new ArrayCollection();
+        $this->sentMessages = new ArrayCollection();
+        $this->receivedMessages = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -408,50 +428,61 @@ class Patient implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getMedicament(): ?string
+    // public function getMedicament(): ?string
+    // {
+    //     return $this->medicament;
+    // }
+
+    // public function setMedicament(?string $medicament): static
+    // {
+    //     $this->medicament = $medicament;
+
+    //     return $this;
+    // }
+
+    // public function getAllergie(): ?string
+    // {
+    //     return $this->allergie;
+    // }
+
+    // public function setAllergie(?string $allergie): static
+    // {
+    //     $this->allergie = $allergie;
+
+    //     return $this;
+    // }
+
+    // public function getMaladie(): ?string
+    // {
+    //     return $this->maladie;
+    // }
+
+    // public function setMaladie(?string $maladie): static
+    // {
+    //     $this->maladie = $maladie;
+
+    //     return $this;
+    // }
+
+    // public function getAntecendentChirurgicaux(): ?string
+    // {
+    //     return $this->antecendent_chirurgicaux;
+    // }
+
+    // public function setAntecendentChirurgicaux(?string $antecendent_chirurgicaux): static
+    // {
+    //     $this->antecendent_chirurgicaux = $antecendent_chirurgicaux;
+
+    //     return $this;
+    // }
+    public function getAntecedents(): ?string
     {
-        return $this->medicament;
+        return $this->antecedents;
     }
 
-    public function setMedicament(?string $medicament): static
+    public function setAntecedents(?string $antecedents): static
     {
-        $this->medicament = $medicament;
-
-        return $this;
-    }
-
-    public function getAllergie(): ?string
-    {
-        return $this->allergie;
-    }
-
-    public function setAllergie(?string $allergie): static
-    {
-        $this->allergie = $allergie;
-
-        return $this;
-    }
-
-    public function getMaladie(): ?string
-    {
-        return $this->maladie;
-    }
-
-    public function setMaladie(?string $maladie): static
-    {
-        $this->maladie = $maladie;
-
-        return $this;
-    }
-
-    public function getAntecendentChirurgicaux(): ?string
-    {
-        return $this->antecendent_chirurgicaux;
-    }
-
-    public function setAntecendentChirurgicaux(?string $antecendent_chirurgicaux): static
-    {
-        $this->antecendent_chirurgicaux = $antecendent_chirurgicaux;
+        $this->antecedents = $antecedents;
 
         return $this;
     }

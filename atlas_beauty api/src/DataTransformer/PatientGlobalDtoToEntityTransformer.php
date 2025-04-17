@@ -10,6 +10,7 @@ use App\Entity\Photo;
 use App\Entity\DemandeDevis;
 use App\Entity\Intervention;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -53,25 +54,20 @@ class PatientGlobalDtoToEntityTransformer
         $patient->setTaille($dto->taille);
         $patient->setTabac($dto->tabac);
         $patient->setAlcool($dto->alcool);
-        $patient->setMedicament($dto->medicament);
-        $patient->setAllergie($dto->allergie);
-        $patient->setMaladie($dto->maladie);
-        $patient->setAntecendentChirurgicaux($dto->antecendent_chirurgicaux);
+        $patient->setAntecedents($dto->antecedents);
         $patient->setVille($dto->ville);
         $patient->setAdress($dto->adress);
         $patient->setCodePostal($dto->code_postal);
 
-
-        // Gérer la photo
-        if (
-            $dto->photoFile instanceof \Symfony\Component\HttpFoundation\File\UploadedFile &&
-            $dto->photoFile->getError() === UPLOAD_ERR_OK
-        ) {
-            $photo = new Photo();
-            $photo->setPhotoFile($dto->photoFile);
-            // Ne pas définir explicitement photoPath, VichUploader le fera
-            $photo->setPatient($patient); // Important: établir la relation bidirectionnelle
-            $patient->addPhoto($photo);
+        if ($dto->photoFiles) {
+            foreach ($dto->photoFiles as $uploadedFile) {
+                if ($uploadedFile instanceof UploadedFile && $uploadedFile->getError() === UPLOAD_ERR_OK) {
+                    $photo = new Photo();
+                    $photo->setPhotoFile($uploadedFile);
+                    $photo->setPatient($patient);
+                    $patient->addPhoto($photo);
+                }
+            }
         }
 
 
@@ -79,7 +75,11 @@ class PatientGlobalDtoToEntityTransformer
         $demandeDevis = new DemandeDevis();
         $demandeDevis->setPatient($patient);
         $demandeDevis->setNote($dto->note);
-        $demandeDevis->setDateSouhaite(new \DateTime($dto->date_souhaite));
+        try {
+            $demandeDevis->setDateSouhaite(new \DateTime($dto->date_souhaite));
+        } catch (\Exception $e) {
+            throw new \InvalidArgumentException('Invalid date format. Expected YYYY-MM-DD');
+        }
         $demandeDevis->setStatus('envoyé');
         $demandeDevis->setDateCreation(new \DateTime());
 

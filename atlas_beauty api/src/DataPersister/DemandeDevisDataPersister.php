@@ -10,7 +10,7 @@ use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use App\Entity\Patient;
 
-class DemandeDevisDataPersister implements DataPersister
+class DemandeDevisDataPersister implements ProcessorInterface
 {
     private $entityManager;
     private $decoratedDataPersister;

@@ -3,6 +3,7 @@
 namespace App\Dto;
 
 use App\Entity\Intervention;
+use Dom\Text;
 use phpDocumentor\Reflection\Types\Nullable;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -58,21 +59,11 @@ class PatientGlobalDto
     #[Groups(['patient:write'])]
     public float $taille;
 
-    //#[Assert\NotBlank]
-    #[Groups(['patient:write'])]
-    public string $medicament;
 
-    //#[Assert\NotBlank]
-    #[Groups(['patient:write'])]
-    public string $allergie;
-
-    //#[Assert\NotBlank]
-    #[Groups(['patient:write'])]
-    public string $maladie;
 
     #[Assert\Type('string')]
     #[Groups(['patient:write'])]
-    public ?string $antecendent_chirurgicaux = null;
+    public ?string $antecedents = null;
 
     //#[Assert\NotBlank]
     #[Groups(['patient:write'])]
@@ -95,8 +86,15 @@ class PatientGlobalDto
     public bool $alcool = false;
 
     #[Groups(['patient:write'])]
-    #[Assert\File(mimeTypes: ['image/jpeg', 'image/png'], mimeTypesMessage: 'Veuillez envoyer une image valide (JPEG ou PNG).', notFoundMessage: 'Aucun fichier trouvé.')]
-    public $photoFile = null;
+    #[Assert\All([
+        new Assert\File([
+            'maxSize' => '5M',
+            'mimeTypes' => ['image/jpeg', 'image/png'],
+            'mimeTypesMessage' => 'Please upload a valid image (JPEG or PNG)',
+        ])
+    ])]
+    public ?array $photoFiles = [];
+    
 
     //#[Assert\NotBlank]
     #[Groups(['patient:write'])]
