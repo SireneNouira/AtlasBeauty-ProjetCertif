@@ -18,7 +18,7 @@ function Chirurgiens() {
         Nos chirurgiens ont été diplômés de meilleures universités. Tous ont une trajectoire allant de 10 à 30 ans d’expérience dans le domaine de la Chirurgie Plastique et Reconstructive, et sont membres des principales associations de chirurgie plastique et reconstructive aux Etats-Unis et en France ainsi que dans le Conseil national de l’Ordre des médecins en Tunisie.
       </p>
   
-      <div className="flex gap-8 px-32 pt-10">
+      <div className="flex gap-8 px-32 pt-10 justify-center items-center">
         {/* Card 1 */}
         <div className="bg-white rounded-xl shadow-md p-4 py-5 w-64 h-fit text-center">
           <img

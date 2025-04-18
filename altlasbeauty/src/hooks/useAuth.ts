@@ -1,31 +1,50 @@
 // hooks/useAuth.ts
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react'
 
 export function useAuth() {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [authState, setAuthState] = useState<{
+    isAuthenticated: boolean | null
+    loading: boolean
+    error: string | null
+  }>({
+    isAuthenticated: null,
+    loading: true,
+    error: null
+  })
 
   useEffect(() => {
     const checkAuth = async () => {
       try {
         const response = await fetch('/api/auth/check', {
-          credentials: 'include' // Important pour envoyer les cookies
-        });
+          credentials: 'include',
+          cache: 'no-store'
+        })
         
-        if (!response.ok) throw new Error('Erreur de vérification');
+        if (!response.ok) throw new Error('Failed to verify authentication')
         
-        const data = await response.json();
-        setIsAuthenticated(data.authenticated);
+        const data = await response.json()
+        setAuthState({
+          isAuthenticated: data.authenticated,
+          loading: false,
+          error: null
+        })
       } catch (error) {
-        console.error('Auth check error:', error);
-        setIsAuthenticated(false);
-      } finally {
-        setLoading(false);
+        console.error('Auth check error:', error)
+        setAuthState({
+          isAuthenticated: false,
+          loading: false,
+          error: error instanceof Error ? error.message : 'Unknown error'
+        })
       }
-    };
+    }
 
-    checkAuth();
-  }, []);
+    checkAuth()
+    
+    // Nettoyage optionnel
+    return () => {
+      // Annuler la requête si nécessaire
+    }
+  }, [])
 
-  return { isAuthenticated, loading };
+  return authState
 }
