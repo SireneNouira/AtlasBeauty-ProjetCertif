@@ -16,7 +16,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
   }, [isAuthenticated, loading, router])
 
   if (loading) {
-    return <p>Chargement....</p>
+    return <p>Chargement....</p> //cree un compoenent de chargement de page
   }
 
   if (!isAuthenticated) {
