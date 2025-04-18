@@ -30,30 +30,3 @@ api.interceptors.response.use(
   }
 );
 export default api;
-// import axios, { AxiosError, AxiosInstance, AxiosResponse } from "axios";
-
-// const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-
-// interface HydraError {
-//   'hydra:description'?: string;
-// }
-
-// const api: AxiosInstance = axios.create({
-//   baseURL: API_URL,
-//   withCredentials: true,
-//   headers: {
-//     "Content-Type": "application/json",
-//   },
-// });
-
-// api.interceptors.response.use(
-//   (response: AxiosResponse) => response,
-//   (error: AxiosError<HydraError>) => {
-//     if (error.response?.data?.['hydra:description']) {
-//       error.message = error.response.data['hydra:description'] || error.message;
-//     }
-//     return Promise.reject(error);
-//   }
-// );
-
-// export default api;
