@@ -1,8 +1,18 @@
+# mercure:
+#     hubs:
+#         default:
+#             url: '%env(MERCURE_URL)%'
+#             public_url: '%env(MERCURE_PUBLIC_URL)%'
+#             jwt:
+#                 secret: '%env(MERCURE_JWT_SECRET)%'
+#                 algorithm: 'hmac.sha256'
+
+# config/packages/mercure.yaml
 mercure:
     hubs:
         default:
-            url: '%env(MERCURE_URL)%'
-            public_url: '%env(MERCURE_PUBLIC_URL)%'
+            url: 'http://localhost:3001/.well-known/mercure'  # URL interne pour le backend
+            public_url: 'http://localhost:3001/.well-known/mercure'  # URL publique pour les clients
             jwt:
-                secret: '%env(MERCURE_JWT_SECRET)%'
+                secret: '%env(MERCURE_JWT_SECRET)%'  # Doit correspondre au secret utilisé par le serveur Mercure
                 algorithm: 'hmac.sha256'

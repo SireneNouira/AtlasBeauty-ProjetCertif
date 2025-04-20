@@ -78,33 +78,71 @@ class MessageProcessor implements ProcessorInterface
             );
         }
     }
-    private function publishMercureUpdate(Message $message): void
-    {
-        $topics = [];
+    // private function publishMercureUpdate(Message $message): void
+    // {
+    //     $topics = [];
         
-        if ($receiver = $message->getReceiverUser()) {
-            $topics[] = "http://example.com/messages/user/{$receiver->getId()}";
-        } 
-        elseif ($receiver = $message->getReceiverPatient()) {
-            $topics[] = "http://example.com/messages/patient/{$receiver->getId()}";
-        }
+    //     if ($receiver = $message->getReceiverUser()) {
+    //         $topics[] = "http://example.com/messages/user/{$receiver->getId()}";
+    //     } 
+    //     elseif ($receiver = $message->getReceiverPatient()) {
+    //         $topics[] = "http://example.com/messages/patient/{$receiver->getId()}";
+    //     }
 
-        $update = new Update(
-            $topics,
-            json_encode([
-                'id' => $message->getId(),
-                'content' => $message->getContent(),
-                'createdAt' => $message->getCreatedAt()->format(\DateTimeInterface::ATOM),
-                'sender' => $message->getSenderUser() ? [
-                    'id' => $message->getSenderUser()->getId(),
-                    'type' => 'user'
-                ] : [
-                    'id' => $message->getSenderPatient()->getId(),
-                    'type' => 'patient'
-                ]
-            ])
-        );
+    //     $update = new Update(
+    //         $topics,
+    //         json_encode([
+    //             'id' => $message->getId(),
+    //             'content' => $message->getContent(),
+    //             'createdAt' => $message->getCreatedAt()->format(\DateTimeInterface::ATOM),
+    //             'sender' => $message->getSenderUser() ? [
+    //                 'id' => $message->getSenderUser()->getId(),
+    //                 'type' => 'user'
+    //             ] : [
+    //                 'id' => $message->getSenderPatient()->getId(),
+    //                 'type' => 'patient'
+    //             ]
+    //         ])
+    //     );
         
-        $this->hub->publish($update);
+    //     $this->hub->publish($update);
+    // }
+    private function publishMercureUpdate(Message $message): void
+{
+    $topics = [];
+    
+    // Ajoutez le topic de l'expéditeur
+    if ($sender = $message->getSenderUser()) {
+        $topics[] = "http://example.com/chat/user-{$sender->getId()}";
+    } 
+    elseif ($sender = $message->getSenderPatient()) {
+        $topics[] = "http://example.com/chat/patient-{$sender->getId()}";
     }
+    
+    // Ajoutez le topic du destinataire
+    if ($receiver = $message->getReceiverUser()) {
+        $topics[] = "http://example.com/chat/user-{$receiver->getId()}";
+    } 
+    elseif ($receiver = $message->getReceiverPatient()) {
+        $topics[] = "http://example.com/chat/patient-{$receiver->getId()}";
+    }
+
+    $update = new Update(
+        array_unique($topics), // Évitez les doublons
+        json_encode([
+            'id' => $message->getId(),
+            'content' => $message->getContent(),
+            'createdAt' => $message->getCreatedAt()->format(\DateTimeInterface::ATOM),
+            'sender' => $message->getSenderUser() ? [
+                'id' => $message->getSenderUser()->getId(),
+                'type' => 'user'
+            ] : [
+                'id' => $message->getSenderPatient()->getId(),
+                'type' => 'patient'
+            ]
+        ])
+    );
+    
+    $this->hub->publish($update);
+}
 }
