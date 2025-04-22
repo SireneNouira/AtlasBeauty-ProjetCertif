@@ -19,7 +19,7 @@ use Symfony\Component\Mercure\Attribute\Publish;
     operations: [
         new GetCollection(),
         new Post(
-            processor: MessageProcessor::class, // Nous allons créer ce processeur
+            processor: MessageProcessor::class,
             mercure: [
                 'topics' => [
                     // 'http://example.com/messages/{receiverUser}/{receiverPatient}', // Nous allons gérer cela dynamiquement

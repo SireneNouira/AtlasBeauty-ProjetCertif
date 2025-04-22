@@ -14,33 +14,31 @@ class MercureTokenController extends AbstractController
     #[Route('/api/mercure-token', name: 'mercure_token', methods: ['GET'])]
     public function __invoke(): JsonResponse
     {
-        $user = $this->getUser();
+        $user   = $this->getUser();
         $topics = [];
 
-        // Si l'utilisateur est un User normal
         if ($user instanceof User) {
             $topics[] = "http://example.com/chat/user-{$user->getId()}";
-            
-            // Ajoutez ici d'autres topics spécifiques aux Users si nécessaire
-        }
-        // Si l'utilisateur est un Patient
-        elseif ($user instanceof Patient) {
+        } elseif ($user instanceof Patient) {
             $topics[] = "http://example.com/chat/patient-{$user->getId()}";
-            
-            // Ajoutez ici d'autres topics spécifiques aux Patients si nécessaire
         }
 
         $payload = [
             'mercure' => [
+                // Vous pouvez restreindre la souscription
                 'subscribe' => $topics,
-                'publish' => $topics // Permet aussi de publier sur ces topics
+
+                // ⚠️ Par défaut vous aviez mis $topics ici, 
+                //     il faut impérativement autoriser '*' pour la publication
+                'publish'   => ['*'],
             ],
-            'exp' => (new \DateTimeImmutable('+1 hour'))->getTimestamp()
+            'exp'     => (new \DateTimeImmutable('+6 hour'))->getTimestamp(),
         ];
 
-        // Utilisez la clé Mercure depuis l'environnement
         $jwtSecret = $this->getParameter('mercure_jwt_secret');
-        $jwt = JWT::encode($payload, $jwtSecret, 'HS256');
+        $jwt       = JWT::encode($payload, $jwtSecret, 'HS256');
+
+     
 
         return $this->json(['token' => $jwt]);
     }

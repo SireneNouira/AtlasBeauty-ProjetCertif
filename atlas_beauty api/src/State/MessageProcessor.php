@@ -78,35 +78,7 @@ class MessageProcessor implements ProcessorInterface
             );
         }
     }
-    // private function publishMercureUpdate(Message $message): void
-    // {
-    //     $topics = [];
-        
-    //     if ($receiver = $message->getReceiverUser()) {
-    //         $topics[] = "http://example.com/messages/user/{$receiver->getId()}";
-    //     } 
-    //     elseif ($receiver = $message->getReceiverPatient()) {
-    //         $topics[] = "http://example.com/messages/patient/{$receiver->getId()}";
-    //     }
 
-    //     $update = new Update(
-    //         $topics,
-    //         json_encode([
-    //             'id' => $message->getId(),
-    //             'content' => $message->getContent(),
-    //             'createdAt' => $message->getCreatedAt()->format(\DateTimeInterface::ATOM),
-    //             'sender' => $message->getSenderUser() ? [
-    //                 'id' => $message->getSenderUser()->getId(),
-    //                 'type' => 'user'
-    //             ] : [
-    //                 'id' => $message->getSenderPatient()->getId(),
-    //                 'type' => 'patient'
-    //             ]
-    //         ])
-    //     );
-        
-    //     $this->hub->publish($update);
-    // }
     private function publishMercureUpdate(Message $message): void
 {
     $topics = [];
@@ -127,21 +99,39 @@ class MessageProcessor implements ProcessorInterface
         $topics[] = "http://example.com/chat/patient-{$receiver->getId()}";
     }
 
+    // $update = new Update(
+    //     array_unique($topics), // Évitez les doublons
+    //     json_encode([
+    //         'id' => $message->getId(),
+    //         'content' => $message->getContent(),
+    //         'createdAt' => $message->getCreatedAt()->format(\DateTimeInterface::ATOM),
+    //         'sender' => $message->getSenderUser() ? [
+    //             'id' => $message->getSenderUser()->getId(),
+    //             'type' => 'user'
+    //         ] : [
+    //             'id' => $message->getSenderPatient()->getId(),
+    //             'type' => 'patient'
+    //         ]
     $update = new Update(
-        array_unique($topics), // Évitez les doublons
+        array_unique($topics),
         json_encode([
+            '@id' => '/api/messages/'.$message->getId(), // Pour la compatibilité avec API Platform
+            '@type' => 'Message',
             'id' => $message->getId(),
             'content' => $message->getContent(),
             'createdAt' => $message->getCreatedAt()->format(\DateTimeInterface::ATOM),
-            'sender' => $message->getSenderUser() ? [
-                'id' => $message->getSenderUser()->getId(),
-                'type' => 'user'
-            ] : [
-                'id' => $message->getSenderPatient()->getId(),
-                'type' => 'patient'
+            'sender' => [
+                '@id' => $message->getSenderUser() 
+                    ? '/api/users/'.$message->getSenderUser()->getId()
+                    : '/api/patients/'.$message->getSenderPatient()->getId(),
+                'id' => $message->getSenderUser() 
+                    ? $message->getSenderUser()->getId() 
+                    : $message->getSenderPatient()->getId(),
+                'type' => $message->getSenderUser() ? 'user' : 'patient'
             ]
         ])
     );
+
     
     $this->hub->publish($update);
 }
