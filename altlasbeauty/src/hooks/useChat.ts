@@ -31,38 +31,6 @@ export const useChat = (
     name: receiverType === 'patient' ? 'Patient' : 'Assistant'
   };
 
-// const fetchMessages = useCallback(async () => {
-//   try {
-//     setLoading(true);
-//     const response = await api.get<any>('/messages', {
-//       params: {
-//         [`sender${currentUserType === 'user' ? 'User' : 'Patient'}.id`]: currentUserId,
-//         [`receiver${receiverType === 'user' ? 'User' : 'Patient'}.id`]: receiverId
-//       }
-//     });
-
-//     // Gestion des différents formats de réponse
-//     const messages = response.data.hydra?.member || 
-//                     response.data['hydra:member'] || 
-//                     response.data.member || 
-//                     [];
-    
-//     setMessages(messages);
-//   } catch (err) {
-//     if (err instanceof Error && 'response' in err) {
-//       console.error('Détails de l\'erreur:', (err as any).response?.data || err);
-//     } else {
-//       console.error('Détails de l\'erreur:', err);
-//     }
-    
-//     setError('Erreur lors du chargement des messages');
-//   } finally {
-//     setLoading(false);
-//   }
-// }, [currentUserId, currentUserType, receiverId, receiverType]);
-
-// hooks/useChat.ts
-
 // Modifiez la partie fetchMessages comme ceci :
 const fetchMessages = useCallback(async () => {
   try {
@@ -110,15 +78,32 @@ const fetchMessages = useCallback(async () => {
         withCredentials: true
       });
 
+      // es.onmessage = (e) => {
+      //   try {
+      //     const message: Message = JSON.parse(e.data);
+      //     setMessages(prev => [...prev, message]);
+      //   } catch (parseErr) {
+      //     console.error('Error parsing message:', parseErr);
+      //   }
+      // };
+
       es.onmessage = (e) => {
         try {
-          const message: Message = JSON.parse(e.data);
-          setMessages(prev => [...prev, message]);
-        } catch (parseErr) {
-          console.error('Error parsing message:', parseErr);
+          const incoming: Message = JSON.parse(e.data);
+      
+          setMessages(prev => {
+            // Si on a déjà ce message (même id), on ne le ré-ajoute pas
+            if (prev.some(m => m.id === incoming.id)) {
+              return prev;
+            }
+            return [...prev, incoming];
+          });
+        } catch (err) {
+          console.error('Error parsing message:', err);
         }
       };
 
+      
       es.onerror = (e) => {
         console.error('Mercure error:', e);
         setError('Problème de connexion en temps réel');
