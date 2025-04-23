@@ -33,7 +33,7 @@ export default function LoginForm() {
           
 
         } else if (response.data.userType === "User") {
-          router.push("/");
+          router.push("/espaceAssistant");
         } else {
           router.push("/");
         }
