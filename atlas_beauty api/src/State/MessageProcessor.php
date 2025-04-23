@@ -98,20 +98,6 @@ class MessageProcessor implements ProcessorInterface
     elseif ($receiver = $message->getReceiverPatient()) {
         $topics[] = "http://example.com/chat/patient-{$receiver->getId()}";
     }
-
-    // $update = new Update(
-    //     array_unique($topics), // Évitez les doublons
-    //     json_encode([
-    //         'id' => $message->getId(),
-    //         'content' => $message->getContent(),
-    //         'createdAt' => $message->getCreatedAt()->format(\DateTimeInterface::ATOM),
-    //         'sender' => $message->getSenderUser() ? [
-    //             'id' => $message->getSenderUser()->getId(),
-    //             'type' => 'user'
-    //         ] : [
-    //             'id' => $message->getSenderPatient()->getId(),
-    //             'type' => 'patient'
-    //         ]
     $update = new Update(
         array_unique($topics),
         json_encode([
