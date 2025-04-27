@@ -15,6 +15,9 @@ import Chatbot from "@/components/Chatbot";
 export default function Home() {
   const accueilRef = useRef(null);
   const [isAccueilVisible, setIsAccueilVisible] = useState(true);
+  const [isChatbotOpen, setIsChatbotOpen] = useState(false); 
+
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -78,6 +81,30 @@ export default function Home() {
           >
               <PresentationIntervention />
           
+          </motion.div>
+        )}
+      </AnimatePresence>
+       {/* 🟡 Bulle flottante pour ouvrir/fermer le chatbot */}
+       <div className="fixed bottom-6 right-6 z-50">
+        <button
+          onClick={() => setIsChatbotOpen(!isChatbotOpen)}
+          className="w-16 h-16 rounded-full bg-rose-500 text-white text-3xl flex items-center justify-center shadow-lg hover:bg-rose-600 transition"
+        >
+          💬
+        </button>
+      </div>
+
+      {/* 🟣 Affichage du Chatbot en bas de l'écran */}
+      <AnimatePresence>
+        {isChatbotOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 50 }}
+            transition={{ duration: 0.3 }}
+            className="fixed bottom-24 right-6  bg-white rounded-xl shadow-lg  z-40"
+          >
+            <Chatbot />
           </motion.div>
         )}
       </AnimatePresence>

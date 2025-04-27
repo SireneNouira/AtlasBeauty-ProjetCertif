@@ -50,12 +50,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       {
         // model: "openrouter/auto", 
         model: "mistralai/mistral-7b-instruct",
-        max_tokens: 700, 
+        max_tokens: 500, 
         messages: [
           {
             role: "system",
             content:
-            "Tu es un assistant virtuel pour une agence de tourisme médical basée en Tunisie. Tu réponds aux questions des patients de manière rassurante, claire et professionnelle. Tu expliques le déroulement des séjours, les procédures médicales proposées, les durées de repos, le suivi post-opératoire, et tout ce qui concerne l'accompagnement avant, pendant et après leur séjour médical en Tunisie.",
+            "Tu es un assistant virtuel pour une agence de tourisme médical basée en Tunisie. Tu réponds aux questions des patients de manière rassurante, claire et professionnelle. Tu expliques le déroulement des séjours, les procédures médicales proposées, les durées de repos, le suivi post-opératoire, et tout ce qui concerne l'accompagnement avant, pendant et après leur séjour médical en Tunisie. Donne des réponses courtes et concises (2 à 3 phrases maximum).",
           },
           { role: "user", content: message },
         ],

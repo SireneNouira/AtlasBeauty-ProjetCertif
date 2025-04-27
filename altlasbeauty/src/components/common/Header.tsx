@@ -1,4 +1,4 @@
-
+'use client';
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { FaInstagram, FaFacebookF, FaWhatsapp } from "react-icons/fa";
@@ -57,6 +57,7 @@ function Header({ isTransparent = false, onTogglePresentation }: HeaderProps) {
         isTransparent ? "" : "shadow-md z-50"
       }`}
     >
+      <Link href="/" className="flex items-center gap-2">
       <Image
         src="/atlas/logo.png"
         alt="AtlasBeauty"
@@ -64,6 +65,7 @@ function Header({ isTransparent = false, onTogglePresentation }: HeaderProps) {
         height={20}
         className=" brightness-[.85] contrast-110 saturate-125"
       />
+      </Link>
 
       <div className="flex items-center gap-4">
         {/* Réseaux sociaux */}

@@ -40,7 +40,7 @@ export default function Chatbot() {
   };
 
   return (
-    <div className="p-4 max-w-md mx-auto rounded-xl shadow border bg-white">
+    <div className="p-4 min-w-xl mx-auto rounded-xl shadow border bg-white">
       <h2 className="text-xl font-semibold mb-4">🤖 Chatbot IA</h2>
       <div className="h-64 overflow-y-auto mb-4 space-y-2">
         {messages.map((msg, i) => (
