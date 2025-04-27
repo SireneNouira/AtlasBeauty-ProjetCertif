@@ -11,6 +11,7 @@ import Footer from "@/components/common/Footer";
 import PresentationIntervention from "@/components/PresentationIntervention";
 import Chatbot from "@/components/Chatbot";
 
+
 export default function Home() {
   const accueilRef = useRef(null);
   const [isAccueilVisible, setIsAccueilVisible] = useState(true);
