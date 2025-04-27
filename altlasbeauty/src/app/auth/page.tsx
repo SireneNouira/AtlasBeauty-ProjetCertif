@@ -26,59 +26,70 @@ export default function AuthPage() {
   }
 
   return (
-    <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-md">
-      <div className="flex border-b mb-6">
-        <button
-          onClick={() => {
-            router.push('/auth')
-            setShowRegister(false)
-          }}
-          className={`py-2 px-4 font-medium ${!showRegister ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500'}`}
-        >
-          Connexion
-        </button>
-        <button
-          onClick={() => {
-            router.push('/auth?action=register')
-            setShowRegister(true)
-          }}
-          className={`py-2 px-4 font-medium ${showRegister ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500'}`}
-        >
-          Inscription
-        </button>
-      </div>
-      
-      {showRegister ? <RegisterForm /> : <LoginForm />}
-      
-      <div className="mt-4 text-center">
-        {showRegister ? (
-          <p>
-            Déjà un compte?{' '}
-            <button 
-              onClick={() => {
-                router.push('/auth')
-                setShowRegister(false)
-              }} 
-              className="text-blue-600 hover:underline"
-            >
-              Se connecter
-            </button>
-          </p>
-        ) : (
-          <p>
-            Pas encore de compte?{' '}
-            <button 
-              onClick={() => {
-                router.push('/auth?action=register')
-                setShowRegister(true)
-              }} 
-              className="text-blue-600 hover:underline"
-            >
-              S'inscrire
-            </button>
-          </p>
-        )}
+    <div className="min-h-screen bg-pink-50 flex items-center justify-center p-4">
+<div className="w-full  overflow-y-auto bg-white p-4 rounded-2xl shadow-lg">
+<div className="flex border-b border-gray-200 mb-5">
+          <button
+            onClick={() => {
+              router.push('/auth')
+              setShowRegister(false)
+            }}
+            className={`flex-1 py-2 text-center font-medium transition-colors ${
+              !showRegister
+                ? 'text-blue-600 border-b-2 border-blue-600'
+                : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            Connexion
+          </button>
+          <button
+            onClick={() => {
+              router.push('/auth?action=register')
+              setShowRegister(true)
+            }}
+            className={`flex-1 py-2 text-center font-medium transition-colors ${
+              showRegister
+                ? 'text-blue-600 border-b-2 border-blue-600'
+                : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            Inscription
+          </button>
+        </div>
+        
+        {showRegister ? <RegisterForm /> : <LoginForm />}
+  
+        <div className="mt-6 text-center text-sm">
+          {showRegister ? (
+            <p>
+              Déjà un compte?{' '}
+              <button 
+                onClick={() => {
+                  router.push('/auth')
+                  setShowRegister(false)
+                }} 
+                className="text-blue-600 hover:underline"
+              >
+                Se connecter
+              </button>
+            </p>
+          ) : (
+            <p>
+              Pas encore de compte?{' '}
+              <button 
+                onClick={() => {
+                  router.push('/auth?action=register')
+                  setShowRegister(true)
+                }} 
+                className="text-blue-600 hover:underline"
+              >
+                S'inscrire
+              </button>
+            </p>
+          )}
+        </div>
       </div>
     </div>
   )
+  
 }

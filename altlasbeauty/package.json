@@ -13,6 +13,7 @@
     "axios": "^1.8.4",
     "event-source-polyfill": "^1.0.31",
     "framer-motion": "^12.6.3",
+    "jose": "^6.0.10",
     "lucide-react": "^0.487.0",
     "next": "15.2.4",
     "react": "^19.0.0",

@@ -10,7 +10,6 @@ import Chirurgiens from "@/components/sections/Chirurgiens";
 import Footer from "@/components/common/Footer";
 import PresentationIntervention from "@/components/PresentationIntervention";
 import Chatbot from "@/components/Chatbot";
-import AuthGuard from "@/components/AuthGuard";
 
 export default function Home() {
   const accueilRef = useRef(null);

@@ -293,7 +293,8 @@ export default function RegisterForm() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto p-6 mt-8 border rounded-lg shadow-md">
+    <div className=" bg-pink-50 p-4 rounded-2xl">
+    <div className="max-w-3xl mx-auto p-6  rounded-2xl shadow-lg bg-white ">
       <h2 className="text-2xl font-semibold text-center mb-6">
         Inscription Patient
       </h2>
@@ -645,6 +646,7 @@ export default function RegisterForm() {
           </div>
         )}
       </form>
+    </div>
     </div>
   );
 }

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import api from "../../utils/api";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
@@ -59,57 +60,79 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="max-w-md mx-auto p-6 mt-8 border rounded-lg shadow-md">
-      <h2 className="text-2xl font-semibold text-center mb-6">Connexion</h2>
-
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="space-y-1">
-          <label htmlFor="email" className="block text-sm font-medium">
-            Email
-          </label>
-          <input
-            id="email"
-            type="email"
-            placeholder="Votre email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            className="w-full p-2 border rounded"
+    <div className=" bg-pink-50 py-4 px-48 rounded-2xl">
+      <div className="bg-white  min-w-lg px-10 py-5 rounded-2xl shadow-lg">
+        {/* Header with logo and titles */}
+        <div className="flex flex-col items-center mb-3">
+          <Image
+            src="/atlas/logo.png"
+            alt="Atlas Beauty"
+            width={90}
+            height={80}
+            className="brightness-[.85] contrast-110 saturate-125"
           />
+          <p className="mt-1 text-sm text-gray-400 italic">
+            Chirurgie esthétique en Tunisie
+          </p>
+          <p className="mt-2 text-blue-600 text-sm">
+            Veuillez entrer votre E-mail et votre mot de passe.
+          </p>
         </div>
 
-        <div className="space-y-1">
-          <label htmlFor="password" className="block text-sm font-medium">
-            Mot de passe
-          </label>
-          <input
-            id="password"
-            type="password"
-            placeholder="Votre mot de passe"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            minLength={6}
-            className="w-full p-2 border rounded"
-          />
-        </div>
+        {/* Login form */}
+        <form onSubmit={handleSubmit} className="space-y-6 px-10">
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              E-mail
+            </label>
+            <input
+              id="email"
+              type="email"
+              placeholder="Votre e-mail"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+            />
+          </div>
 
-        <div className="pt-2">
+          <div>
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              Mot de passe
+            </label>
+            <input
+              id="password"
+              type="password"
+              placeholder="Votre mot de passe"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              minLength={6}
+              className="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+            />
+          </div>
+
+          <div className="text-right">
+            <a href="#" className="text-sm text-blue-600 hover:underline">
+              Mots de passe oublié ?
+            </a>
+          </div>
+
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-3 uppercase bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isLoading ? "Connexion en cours..." : "Se connecter"}
+            {isLoading ? "Connexion en cours..." : "CONNEXION"}
           </button>
-        </div>
 
-        {error && (
-          <div className="p-3 text-red-600 bg-red-50 rounded-md text-center">
-            {error}
-          </div>
-        )}
-      </form>
+          {error && (
+            <div className="mt-4 p-3 text-red-600 bg-red-50 rounded-md text-center">
+              {error}
+            </div>
+          )}
+        </form>
+      </div>
     </div>
   );
 }
