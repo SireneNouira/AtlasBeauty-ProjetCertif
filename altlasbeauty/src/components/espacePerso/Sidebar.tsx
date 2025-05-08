@@ -8,6 +8,7 @@ import {
   FaBell,
   FaPlus,
   FaSignOutAlt,
+  
 } from 'react-icons/fa'
 
 export default function Sidebar() {
@@ -45,6 +46,11 @@ export default function Sidebar() {
           <FaPlus className="w-5 h-5 mr-3" />
           Nouvelle demande
         </Link>
+
+        <Link href="/patient/chat"
+          className="flex items-center px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition"
+          >        Message
+                  </Link>
       </nav>
 
       <Link
