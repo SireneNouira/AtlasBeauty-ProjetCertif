@@ -1,72 +1,106 @@
 // app/espacePerso/page.tsx
 "use client";
 
-import Image from "next/image";
-import Link from "next/link";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import AuthGuard from "@/components/AuthGuard";
-import MeInfo from "@/components/espacePerso/MeInfo";
 import Sidebar from "@/components/espacePerso/Sidebar";
-import MonDossier from '@/components/espacePerso/MonDossier'
-import { useState } from 'react'
+import MeInfo from "@/components/espacePerso/MeInfo";
+import MonDossier from "@/components/espacePerso/MonDossier";
+import DonneePerso from "@/components/espacePerso/DonneePerso";
+import Image from "next/image"
+import Link from "next/link"
+import { EspacePersoProvider } from "@/contexts/EspacePersoContext";
+
+type ViewType =
+  | "info"
+  | "dossier"
+  | "personal-data"
+  | "medical-history"
+  | "new-request"
+  | "messages";
 
 export default function EspacePersoPage() {
-  const [view, setView] = useState<'info' | 'dossier'>('info')
+  const router = useRouter();
+  const [view, setView] = useState<ViewType>("info");
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search)
+    const viewParam = urlParams.get('view') as ViewType | null
+    if (viewParam && ['info', 'dossier', 'personal-data', 'medical-history', 'new-request', 'messages'].includes(viewParam)) {
+      setView(viewParam)
+    }
+  }, [])
+
+  const handleNavigation = (targetView: ViewType) => {
+    setView(targetView);
+    // Optionnel: mettre à jour l'URL sans recharger la page
+    router.replace(`/espacePerso?view=${targetView}`, { scroll: false });
+  };
+
+  const renderContent = () => {
+    switch (view) {
+      case "info":
+        return <MeInfo onConsult={() => handleNavigation("dossier")} />;
+      case "dossier":
+        return <MonDossier />;
+      case "personal-data":
+        return <DonneePerso />;
+      case "medical-history":
+        return <div>Antécédents médicaux (à implémenter)</div>;
+      case "new-request":
+        return <div>Nouvelle demande (à implémenter)</div>;
+      case "messages":
+        return <div>Messages (à implémenter)</div>;
+      default:
+        return <MeInfo onConsult={() => handleNavigation("dossier")} />;
+    }
+  };
 
   return (
     <AuthGuard>
-      <div className="flex flex-col min-h-screen">
-        {/* ─────────────── HEADER ─────────────── */}
-        <header className="grid grid-cols-3 items-center bg-white px-8 py-2 shadow-md z-10">
-          {/* logo */}
-          <div className="col-start-1">
-            <Image
-              src="/atlas/logo.png"
-              alt="Atlas Beauty"
-              width={80}
-              height={40}
-              priority
-            />
+      <EspacePersoProvider>
+        <div className="flex flex-col min-h-screen">
+          {/* ─────────────── HEADER ─────────────── */}
+          <header className="grid grid-cols-3 items-center bg-white px-8 py-2 shadow-md z-10">
+            {/* logo */}
+            <div className="col-start-1">
+              <Image
+                src="/atlas/logo.png"
+                alt="Atlas Beauty"
+                width={80}
+                height={40}
+                priority
+              />
+            </div>
+
+            {/* fleur */}
+            <div className="col-start-2 flex justify-center">
+              <Image
+                src="/atlas/fleur.png"
+                alt="Lotus"
+                width={60}
+                height={40}
+                priority
+              />
+            </div>
+
+            {/* bouton Retour */}
+            <div className="col-start-3 flex justify-end">
+              <Link
+                href="/"
+                className="bg-blue-500 text-white px-4 py-1 rounded-lg hover:bg-blue-600 transition"
+              >
+                Retour au site
+              </Link>
+            </div>
+          </header>
+          <div className="flex flex-1 bg-sky-200">
+            <Sidebar onNavigate={handleNavigation} currentView={view} />
+            <main className="flex-1 p-12">{renderContent()}</main>
           </div>
-
-          {/* fleur */}
-          <div className="col-start-2 flex justify-center">
-            <Image
-              src="/atlas/fleur.png"
-              alt="Lotus"
-              width={60}
-              height={40}
-              priority
-            />
-          </div>
-
-          {/* bouton Retour */}
-          <div className="col-start-3 flex justify-end">
-            <Link
-              href="/"
-              className="bg-blue-500 text-white px-4 py-1 rounded-lg hover:bg-blue-600 transition"
-            >
-              Retour au site
-            </Link>
-          </div>
-        </header>
-
-        {/* ─────────────── PAGE BODY ─────────────── */}
-        <div className="flex flex-1 bg-sky-200 ">
-          {/* sidebar à gauche */}
-          <Sidebar />
-
-          {/* contenu principal */}
-          <main className="flex-1 p-12 ">
-          {view === 'info' ? (
-              // Passe un callback à MeInfo pour changer la vue
-              <MeInfo onConsult={() => setView('dossier')} />
-            ) : (
-              // Affiche MonDossier quand view==='dossier'
-              <MonDossier />
-            )}
-          </main>
         </div>
-      </div>
+      </EspacePersoProvider>
     </AuthGuard>
   );
 }
