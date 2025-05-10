@@ -5,7 +5,6 @@ namespace App\Security;
 use App\Entity\Patient;
 use App\Entity\User;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
-// use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenanagerInterface;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
