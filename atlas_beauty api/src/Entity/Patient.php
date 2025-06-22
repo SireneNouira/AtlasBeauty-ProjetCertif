@@ -6,6 +6,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use App\DataPersister\PatientDataPersister;
@@ -54,6 +55,11 @@ use Symfony\Component\Serializer\Attribute\Groups;
             security: "is_granted('PATIENT_EDIT', object)",
             denormalizationContext: ['groups' => ['patient:update']]
         ),
+        new Patch(
+            security: "is_granted('PATIENT_EDIT', object)",
+            denormalizationContext: ['groups' => ['patient:update']],
+            formats: ['json' => ['application/merge-patch+json']]
+        ),
         new Delete(
             security: "is_granted('PATIENT_DELETE', object)"
         )
@@ -67,7 +73,7 @@ class Patient implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
-    #[Groups(['patient:write', 'patient:read', 'patient:update'])]
+    #[Groups(['patient:write', 'patient:read'])]
     private ?string $email = null;
 
     /**
@@ -80,7 +86,7 @@ class Patient implements UserInterface, PasswordAuthenticatedUserInterface
      * @var string The hashed password
      */
     #[ORM\Column]
-    #[Groups(['patient:write', 'patient:update'])]
+    #[Groups(['patient:write'])]
     private ?string $password = null;
 
     #[ORM\Column(length: 255)]
@@ -124,7 +130,7 @@ class Patient implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $tel = null;
 
     #[ORM\Column(type: "decimal", precision: 5, scale: 2, nullable: true)]
-    #[Groups(['patient:write'])]
+    #[Groups(['patient:write', 'patient:update', 'patient:read'])]
     private ?float $poids = null;
 
     #[ORM\Column(type: "decimal", precision: 5, scale: 1, nullable: true)]

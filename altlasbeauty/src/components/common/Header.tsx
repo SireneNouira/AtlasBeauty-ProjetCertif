@@ -87,7 +87,7 @@ function Header({ isTransparent = false, onTogglePresentation }: HeaderProps) {
             <FaFacebookF size={20} />
           </a>
           <a
-            href="https://wa.me/21652869696"
+            href="https://wa.me/21600000000"
             target="_blank"
             rel="noopener noreferrer"
             className="text-green-500 hover:text-green-700 transition"
@@ -97,7 +97,7 @@ function Header({ isTransparent = false, onTogglePresentation }: HeaderProps) {
           <div className="ml-2 text-sm leading-tight">
             <p className="text-gray-700">WhatsApp</p>
             <p className="text-md font-semibold text-gray-900">
-              +216 52 86 96 96
+              +216 00 00 00 00
             </p>
           </div>
         </div>

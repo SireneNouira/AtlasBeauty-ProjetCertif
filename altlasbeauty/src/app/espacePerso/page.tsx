@@ -11,12 +11,13 @@ import DonneePerso from "@/components/espacePerso/DonneePerso";
 import Image from "next/image"
 import Link from "next/link"
 import { EspacePersoProvider } from "@/contexts/EspacePersoContext";
+import Devis from "@/components/espacePerso/Devis";
 
 type ViewType =
   | "info"
   | "dossier"
   | "personal-data"
-  | "medical-history"
+  | "devis"
   | "new-request"
   | "messages";
 
@@ -27,7 +28,7 @@ export default function EspacePersoPage() {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search)
     const viewParam = urlParams.get('view') as ViewType | null
-    if (viewParam && ['info', 'dossier', 'personal-data', 'medical-history', 'new-request', 'messages'].includes(viewParam)) {
+    if (viewParam && ['info', 'dossier', 'personal-data', 'devis', 'new-request', 'messages'].includes(viewParam)) {
       setView(viewParam)
     }
   }, [])
@@ -46,8 +47,8 @@ export default function EspacePersoPage() {
         return <MonDossier />;
       case "personal-data":
         return <DonneePerso />;
-      case "medical-history":
-        return <div>Antécédents médicaux (à implémenter)</div>;
+      case "devis":
+        return <Devis />;
       case "new-request":
         return <div>Nouvelle demande (à implémenter)</div>;
       case "messages":
@@ -95,6 +96,8 @@ export default function EspacePersoPage() {
               </Link>
             </div>
           </header>
+
+          {/* ─────────────── CONTENT ─────────────── */} 
           <div className="flex flex-1 bg-sky-200">
             <Sidebar onNavigate={handleNavigation} currentView={view} />
             <main className="flex-1 p-12">{renderContent()}</main>

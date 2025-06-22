@@ -63,10 +63,10 @@ export default function MonDossier() {
       <div className="bg-white rounded-2xl shadow-lg p-6 flex flex-col sm:flex-row justify-between items-center text-gray-300 text-sm">
         <div className="space-y-1 text-center sm:text-left">
           <p>Adresse : 14, rue Imam Abou Hanifa – 2070 La Marsa – Tunisie</p>
-          <p>Tél. : 00 216 71 742 160 / 00 216 27 432 000</p>
+          <p>Tél. : 00 216 00 000 000 / 00 216 00 000 000</p>
         </div>
         <div className="flex space-x-4 mt-4 sm:mt-0">
-          <Link href="https://wa.me/21671742160">
+          <Link href="https://wa.me/21600000000">
             <img src="/icons/whatsapp.svg" alt="WhatsApp" className="w-5 h-5 hover:opacity-75" />
           </Link>
           <Link href="https://instagram.com/atlas.beauty">

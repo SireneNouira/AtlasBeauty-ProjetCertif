@@ -6,17 +6,38 @@ interface CarouselAvantApresProps {
   slug: string;
 }
 
-const imageCount: Record<string, number> = {
-  visage: 5,
-  mammaire: 4,
-  corps: 6,
-  dentaire: 3,
-  cheveux: 3,
-  soin: 2,
+const imagePaths: Record<string, string[]> = {
+  visage: [
+    '/visage/nez_avant-apres.png',
+    '/visage/visage_avant-apres.png',
+    '/visage/nez_avant-apres.png',
+
+  ],
+  mammaire: [
+    '/poitrine/poitrine_avant-apres.png',
+    '/poitrine/poitrine_avant-apres.png',
+    '/poitrine/poitrine_avant-apres.png',
+  ],
+  greffe: [
+    '/greffe/greffe_avant-apres.png',
+    '/greffe/greffe_avant-apres.png',
+    '/greffe/greffe_avant-apres.png',
+  ],
+  dent: [
+    '/dent/dent_avant-apres.png',
+    '/dent/dent_avant-apres.png',
+    '/dent/dent_avant-apres.png',
+  ],
+  corps: [
+    '/corps/corps_avant-apres.png',
+    '/corps/corps_avant-apres.png',
+    '/corps/corps_avant-apres.png',
+  ],
 };
 
 export default function CarouselAvantApres({ slug }: CarouselAvantApresProps) {
-  const totalImages = imageCount[slug] || 0;
+  const images = imagePaths[slug] || [];
+  const totalImages = images.length;
   const [currentIndex, setCurrentIndex] = useState(0);
 
   if (totalImages === 0) return null;
@@ -28,8 +49,6 @@ export default function CarouselAvantApres({ slug }: CarouselAvantApresProps) {
   const prevSlide = () => {
     setCurrentIndex((prev) => (prev - 1 + totalImages) % totalImages);
   };
-
-  const images = Array.from({ length: totalImages }, (_, i) => `/images/${slug}/avant-apres/${i + 1}.jpg`);
 
   return (
     <div className="relative w-full overflow-hidden rounded-xl shadow-lg">

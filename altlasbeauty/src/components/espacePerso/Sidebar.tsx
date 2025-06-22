@@ -24,7 +24,7 @@ export default function Sidebar({ currentView, onNavigate }: SidebarProps) {
           }`}
         >
           <FaFolderOpen className="w-5 h-5 mr-3" />
-          Mes demandes
+          Acceuil
         </button>
 
         <button
@@ -40,7 +40,7 @@ export default function Sidebar({ currentView, onNavigate }: SidebarProps) {
         </button>
 
         <button
-          onClick={() => onNavigate('medical-history')}
+          onClick={() => onNavigate('devis')}
           className={`flex items-center w-full px-4 py-2 rounded-lg transition ${
             isActive('medical-history')
               ? 'bg-sky-300 text-blue-600'
@@ -48,7 +48,7 @@ export default function Sidebar({ currentView, onNavigate }: SidebarProps) {
           }`}
         >
           <FaBell className="w-5 h-5 mr-3" />
-          Antécédents médicaux
+         Devis
         </button>
 
         <button

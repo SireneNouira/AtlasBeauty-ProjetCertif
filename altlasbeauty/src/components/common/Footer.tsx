@@ -24,7 +24,7 @@ function Footer() {
         <div>
           <h3 className="text-lg font-semibold mb-2">Contact</h3>
           <p className="text-sm">📞 WhatsApp : <br />
-            <span className="text-base font-medium">+216 52 86 96 96</span>
+            <span className="text-base font-medium">+216 00 00 00 00</span>
           </p>
           <p className="text-sm mt-2">✉️ contact@atlas-beauty.fr</p>
         </div>
@@ -69,7 +69,7 @@ function Footer() {
         <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer">
           <FaFacebookF className="text-blue-500 hover:text-blue-600" size={24} />
         </a>
-        <a href="https://wa.me/21652869696" target="_blank" rel="noopener noreferrer">
+        <a href="https://wa.me/21600000000" target="_blank" rel="noopener noreferrer">
           <FaWhatsapp className="text-green-500 hover:text-green-600" size={24} />
         </a>
       </div>

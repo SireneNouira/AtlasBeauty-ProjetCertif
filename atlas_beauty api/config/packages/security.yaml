@@ -84,7 +84,8 @@ security:
     - { path: ^/api/mercure-token, roles: IS_AUTHENTICATED_FULLY }
 
     - { path: ^/admin, roles: ROLE_ADMIN }
-  
+
+    - { path: ^/api/patients, roles: IS_AUTHENTICATED_FULLY, methods: [PATCH] }
 when@test:
   security:
     password_hashers:

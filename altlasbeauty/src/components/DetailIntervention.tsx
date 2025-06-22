@@ -1,6 +1,6 @@
 'use client';
 
-import { InterventionDetail } from '@/types/intervention';
+import { InterventionDetail } from '@/utils/interventions-data';
 
 export default function DetailIntervention({ intervention }: { intervention: InterventionDetail }) {
   return (
@@ -28,7 +28,7 @@ export default function DetailIntervention({ intervention }: { intervention: Int
                   <button className="bg-rose-600 text-white px-6 py-2 rounded-md">Lire plus</button>
                 </div>
                 <div className="md:w-1/2 order-1 md:order-2">
-                  <img src={op.image} alt={op.title} className="rounded-2xl shadow-lg" />
+                  <img src={op.image} alt={op.title} className="rounded-2xl shadow-lg object-cover w-full h-72" />
                 </div>
               </>
             )}
