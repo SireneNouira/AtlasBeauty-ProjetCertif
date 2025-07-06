@@ -7,6 +7,7 @@ use ApiPlatform\State\ProcessorInterface;
 use App\DataTransformer\PatientGlobalDtoToEntityTransformer;
 use App\Dto\PatientGlobalDto;
 use App\Entity\Patient;
+use App\Entity\Photo;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -39,12 +40,6 @@ class PatientDataPersister implements ProcessorInterface
             // Persistez le patient et les entités associées
             $this->entityManager->persist($patient);
 
-            // Persister explicitement chaque photo
-            foreach ($patient->getPhotos() as $photo) {
-                // Assurez-vous que la relation est correctement établie dans les deux sens
-                $photo->setPatient($patient);
-                $this->entityManager->persist($photo);
-            }
 
             $this->entityManager->flush();
 

@@ -2,13 +2,14 @@
 
 namespace App\Serializer\Encoder;
 
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Serializer\Encoder\DecoderInterface;
 
 class MultipartFormDataDecoder implements DecoderInterface
 {
     private const FORMAT = 'multipart';
-    
+
 
     /**
      * Définition des types attendus pour chaque champ du DTO
@@ -48,23 +49,17 @@ class MultipartFormDataDecoder implements DecoderInterface
         );
 
         // Traitement spécial pour les fichiers (séparé du reste pour éviter les erreurs)
-        foreach ($request->files->all() as $key => $file) {
-            if ($file instanceof \Symfony\Component\HttpFoundation\File\UploadedFile) {
-                // Vérifier si le fichier est valide (erreur = UPLOAD_ERR_OK)
-                if ($file->getError() === UPLOAD_ERR_OK) {
-                    $result[$key] = $file;
-                } else {
-                    // Journaliser l'erreur mais ne rien ajouter au résultat
-                    error_log(sprintf(
-                        'Erreur lors du téléchargement du fichier %s: code %d',
-                        $file->getClientOriginalName(),
-                        $file->getError()
-                    ));
-                    // Définir explicitement comme null pour éviter les problèmes de désérialisation
-                    $result[$key] = null;
-                }
+        foreach ($request->files->all() as $key => $value) {
+            if ($value instanceof UploadedFile) {
+                $result[$key] = $value;                     // fichier unique
+            } elseif (is_array($value)) {
+                // tableau de fichiers : on filtre ceux qui sont valides
+                $result[$key] = array_values(array_filter($value, function ($file) {
+                    return $file instanceof UploadedFile && $file->getError() === UPLOAD_ERR_OK;
+                }));
             }
         }
+
 
         // Convertir les champs selon leur type attendu
         foreach (self::FIELD_TYPES as $field => $type) {
