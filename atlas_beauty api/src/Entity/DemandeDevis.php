@@ -6,6 +6,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use App\Repository\DemandeDevisRepository;
@@ -21,8 +22,8 @@ operations: [
         security: "is_granted('DEMANDE_DEVIS_VIEW', object)"
     ),
     new GetCollection(
-        security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_ASSISTANT')"
-    ),
+    security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_ASSISTANT') or is_granted('ROLE_USER')"
+),
     new Post(
         security: "is_granted('DEMANDE_DEVIS_CREATE')",
         securityMessage: "Vous avez déjà une demande de devis en cours. Supprimez-la avant d'en créer une nouvelle.",
@@ -35,7 +36,11 @@ operations: [
     new Delete(
         security: "is_granted('DEMANDE_DEVIS_DELETE', object)",
         securityMessage: "Vous ne pouvez pas supprimer cette demande de devis."
-    )
+    ),
+    new Patch(
+    security: "is_granted('DEMANDE_DEVIS_EDIT', object)",
+    securityMessage: "Vous ne pouvez pas modifier cette demande de devis."
+),
 ])]
 class DemandeDevis
 {

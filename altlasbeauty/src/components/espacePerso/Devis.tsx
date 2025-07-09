@@ -2,7 +2,7 @@ import React from 'react'
 
 function Devis() {
   return (
-    <div>Devis</div>
+    <div>Vous n'avez pas encore recu de devis</div>
   )
 }
 

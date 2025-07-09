@@ -6,6 +6,7 @@ use ApiPlatform\Metadata\Get;
 use App\State\MeProvider;
 
 #[ApiResource(
+    normalizationContext: ['groups' => ['me:read']],
     operations: [
         new Get(
             uriTemplate: '/me',
@@ -14,9 +15,5 @@ use App\State\MeProvider;
         )
     ],
     routePrefix: '/')]
-class Me {
+class Me {}
 
-
-
-
-}

@@ -85,11 +85,10 @@ class MeProvider implements ProviderInterface
         // Infos de base
         $dto->id = $user->getId();
         $dto->email = $user->getEmail();
-        
+
         if ($user instanceof Patient) {
             $this->populatePatientData($dto, $user);
         }
-
         return $dto;
     }
 
@@ -100,13 +99,13 @@ class MeProvider implements ProviderInterface
         $dto->nom = $patient->getNom();
         $dto->civilite = $patient->getCivilite();
         $dto->annee_naissance = $patient->getAnneeNaissance();
-        
+
         // Adresse
         $dto->adress = $patient->getAdress();
         $dto->code_postal = $patient->getCodePostal();
         $dto->ville = $patient->getVille();
         $dto->pays = $patient->getPays();
-        
+
         // Autres infos
         $dto->profession = $patient->getProfession();
         $dto->tel = $patient->getTel();
@@ -115,7 +114,7 @@ class MeProvider implements ProviderInterface
         $dto->tabac = $patient->isTabac();
         $dto->alcool = $patient->isAlcool();
         $dto->antecedents = $patient->getAntecedents();
-        
+
         // Photos
         foreach ($patient->getPhotos() as $photo) {
             $dto->photos[] = [
@@ -124,21 +123,24 @@ class MeProvider implements ProviderInterface
                 'uploadedAt' => $photo->getUpdatedAt()?->format('Y-m-d H:i:s')
             ];
         }
-        
+
         // Demande de devis
-        $demandeDevis = $patient->getDemandeDevis()->first() ?: null;
-        if ($demandeDevis) {
-            $dto->demandeDevis = [
-                'id' => $demandeDevis->getId(),
-                'note' => $demandeDevis->getNote(),
-                'date_souhaite' => $demandeDevis->getDateSouhaite()?->format('Y-m-d'),
-                'status' => $demandeDevis->getStatus(),
-                'date_creation' => $demandeDevis->getDateCreation()?->format('Y-m-d H:i:s'),
-                'intervention_1' => $demandeDevis->getIntervention1()?->getName(),
-                'intervention_2' => $demandeDevis->getIntervention2()?->getName()
-            ];
-        }
-        
+         $demandeDevis = $patient->getDemandeDevis()->first() ?: null;
+
+  if ($demandeDevis) {
+    $dto->demandeDevis = [
+        'id' => $demandeDevis->getId(),
+            'note' => $demandeDevis->getNote(),
+            'date_souhaite' => $demandeDevis->getDateSouhaite()?->format('Y-m-d'),
+            'status' => $demandeDevis->getStatus(),
+            'date_creation' => $demandeDevis->getDateCreation()?->format('Y-m-d H:i:s'),
+            'intervention_1' => $demandeDevis->getIntervention1()?->getName(),
+            'intervention_2' => $demandeDevis->getIntervention2()?->getName(),
+        ];
+    } else {
+        $dto->demandeDevis = null;
+    }
+
         // Devis
         $devis = $patient->getDevis();
         if ($devis) {
@@ -149,8 +151,8 @@ class MeProvider implements ProviderInterface
                 'is_signed' => $devis->isSigned(),
                 'date_sejour' => $devis->getDateSejour()?->format('Y-m-d')
             ];
-        }
-        
+        } 
+
         // Statut global
         $dto->status = [
             'hasPhotos' => !$patient->getPhotos()->isEmpty(),

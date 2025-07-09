@@ -12,13 +12,14 @@ import Image from "next/image"
 import Link from "next/link"
 import { EspacePersoProvider } from "@/contexts/EspacePersoContext";
 import Devis from "@/components/espacePerso/Devis";
+import EditDevis from "@/components/espacePerso/EditDevis";
 
 type ViewType =
   | "info"
   | "dossier"
   | "personal-data"
   | "devis"
-  | "new-request"
+  | "edit-devis"
   | "messages";
 
 export default function EspacePersoPage() {
@@ -28,7 +29,7 @@ export default function EspacePersoPage() {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search)
     const viewParam = urlParams.get('view') as ViewType | null
-    if (viewParam && ['info', 'dossier', 'personal-data', 'devis', 'new-request', 'messages'].includes(viewParam)) {
+    if (viewParam && ['info', 'dossier', 'personal-data', 'devis', 'edit-devis', 'messages'].includes(viewParam)) {
       setView(viewParam)
     }
   }, [])
@@ -49,8 +50,8 @@ export default function EspacePersoPage() {
         return <DonneePerso />;
       case "devis":
         return <Devis />;
-      case "new-request":
-        return <div>Nouvelle demande (à implémenter)</div>;
+      case "edit-devis":
+        return <EditDevis />;
       case "messages":
         return <div>Messages (à implémenter)</div>;
       default:

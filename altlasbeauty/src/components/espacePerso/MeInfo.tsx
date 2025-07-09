@@ -54,13 +54,8 @@ export default function MeInfo({ onConsult }: MeInfoProps) {
             ▶ Consulter ma demande
           </button>
 
-          <Link href="/espace-perso/modifier-infos">
-            <button className="bg-gray-100 border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-200 transition">
-              ✎ Modifier mes informations
-            </button>
-          </Link>
 
-          <Link href="/chat">
+          <Link href="/patient/chat">
             <button className="bg-green-100 border border-green-300 text-green-800 px-4 py-2 rounded-lg hover:bg-green-200 transition">
               💬 Contacter une assistante
             </button>

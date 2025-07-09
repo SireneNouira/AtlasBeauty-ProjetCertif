@@ -2,60 +2,65 @@
 
 namespace App\DataPersister;
 
-use ApiPlatform\Doctrine\Common\DataPersister;
-use ApiPlatform\Metadata\Operation;
+use ApiPlatform\State\ProcessorInterface;
 use App\Entity\DemandeDevis;
+use App\Entity\Patient;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use App\Entity\Patient;
+use ApiPlatform\Metadata\Operation;
 
 class DemandeDevisDataPersister implements ProcessorInterface
 {
-    private $entityManager;
-    private $decoratedDataPersister;
-    private $security;
-
     public function __construct(
-        EntityManagerInterface $entityManager,
-        DataPersister $decoratedDataPersister,
-        Security $security
-    ) {
-        $this->entityManager = $entityManager;
-        $this->decoratedDataPersister = $decoratedDataPersister;
-        $this->security = $security;
-    }
+        private EntityManagerInterface $em,
+        private ProcessorInterface $decorated,
+        private Security $security
+    ) {}
 
     public function supports($data, Operation $operation = null, array $context = []): bool
     {
         return $data instanceof DemandeDevis;
     }
 
-    public function persist($data, Operation $operation = null, array $context = [])
+    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
     {
-        // Si c'est une création de demande
-        if ($data instanceof DemandeDevis && !$data->getId()) {
-            $user = $this->security->getUser();
-            
-            // Si l'utilisateur est connecté et qu'il s'agit d'un patient
-            if ($user instanceof Patient) {
-                // Vérifier s'il a déjà une demande en cours
-                if (!$user->getDemandeDevis()->isEmpty()) {
-                    throw new BadRequestHttpException('Vous avez déjà une demande de devis en cours. Supprimez-la avant d\'en créer une nouvelle.');
-                }
-                
-                // Assigner le patient à la demande
-                $data->setPatient($user);
-            }
-            // Si non connecté, c'est géré par le processus d'inscription
+        if (!$data instanceof DemandeDevis) {
+            return $this->decorated->process($data, $operation, $uriVariables, $context);
         }
 
-        // Déléguer la persistence au décorateur
-        return $this->decoratedDataPersister->persist($data, $operation, $context);
-    }
+        // Empêcher la modification si devis signé
+        if ($data->getDevis() && $data->getDevis()->isSigned()) {
+            throw new BadRequestHttpException("Vous ne pouvez plus modifier la demande car le devis est signé.");
+        }
 
-    public function remove($data, Operation $operation = null, array $context = [])
-    {
-        return $this->decoratedDataPersister->remove($data, $operation, $context);
+        // Gestion de l'association du patient pour toutes les opérations d'écriture
+        if ($operation->canWrite() && !$data->getPatient()) {
+            $user = $this->security->getUser();
+            
+            if (!$user instanceof Patient) {
+                throw new BadRequestHttpException("Seuls les patients peuvent créer ou modifier des demandes de devis.");
+            }
+
+            // Vérifier que le patient existe bien en base
+            $existingPatient = $this->em->getRepository(Patient::class)->find($user->getId());
+            if (!$existingPatient) {
+                throw new BadRequestHttpException("Patient associé introuvable.");
+            }
+
+            $data->setPatient($existingPatient);
+        }
+
+        // Validation supplémentaire pour les nouvelles demandes
+        if ($operation->getName() === 'post') {
+            if (!$data->getIntervention1()) {
+                throw new BadRequestHttpException("Une intervention principale est obligatoire.");
+            }
+
+            $data->setStatus('envoyé');
+            $data->setDateCreation(new \DateTime());
+        }
+
+        return $this->decorated->process($data, $operation, $uriVariables, $context);
     }
 }
