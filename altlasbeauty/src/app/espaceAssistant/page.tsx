@@ -1,11 +1,10 @@
-'use client'
+import AssistantGuard from "@/components/AssistantGuard";
+import EspaceAssistantPage from "./EspaceAssistantPage"; // bon chemin selon ton arbo
 
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
-import api from '@/utils/api'
-
-
-export default function EspaceAssistant() {
- 
-  return <div>Espace Assistant sécurisé !</div>
+export default function Page() {
+  return (
+    <AssistantGuard>
+      <EspaceAssistantPage />
+    </AssistantGuard>
+  );
 }
