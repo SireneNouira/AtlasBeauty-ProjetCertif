@@ -1,9 +1,11 @@
-import React from 'react'
+'use client'
 
-function page() {
-  return (
-    <div>hi assistant !</div>
-  )
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import api from '@/utils/api'
+
+
+export default function EspaceAssistant() {
+ 
+  return <div>Espace Assistant sécurisé !</div>
 }
-
-export default page

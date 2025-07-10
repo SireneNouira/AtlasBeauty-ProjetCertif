@@ -36,6 +36,7 @@ export default function MeInfo({ onConsult }: MeInfoProps) {
     <div className="space-y-8">
       {/* ─── BLOC BLEU-CIEL AVEC CONTENU BLANC ─── */}
       <div className="relative bg-white rounded-2xl shadow-lg p-8">
+        
         <h2 className="text-blue-600 text-xl font-semibold mb-4">
           Bonjour {patientData.prenom} {patientData.nom} et bienvenue dans votre
           Espace Perso.

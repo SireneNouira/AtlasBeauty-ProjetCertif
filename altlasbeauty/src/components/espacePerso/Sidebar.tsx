@@ -63,6 +63,18 @@ export default function Sidebar({ currentView, onNavigate }: SidebarProps) {
           Voir demande de devis
         </button>
 
+        <button
+          onClick={() => onNavigate('photos')}
+          className={`flex items-center w-full px-4 py-2 rounded-lg transition ${
+            isActive('new-request')
+              ? 'bg-sky-300 text-blue-600'
+              : 'text-gray-600 hover:bg-gray-100'
+          }`}
+        >
+          <FaPlus className="w-5 h-5 mr-3" />
+          Photos
+        </button>
+
         <Link href="/patient/chat"
           className="flex items-center px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition"
           >        Message
