@@ -280,9 +280,16 @@ export default function DossierPatientPage() {
       </div>
 
       <button
-        className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition"
-        onClick={() => router.push(`/assistant/chat/${patient.id}`)}
-      >
+        onClick={() => {
+                      if (patientId) {
+                        router.push(`/assistant/chat/${patientId}`);
+                      } else {
+                        alert("Aucun patient lié à cette demande !");
+                      }
+                    }}
+                    className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition"
+                    disabled={!patientId}
+                  >
         Envoyer un message au patient
       </button>
     </div>

@@ -32,18 +32,62 @@ export const useChat = (
   };
 
 // Modifiez la partie fetchMessages comme ceci :
-const fetchMessages = useCallback(async () => {
-  try {
-    setLoading(true);
-    const response = await api.get('/messages', {
-      params: {
-        [`sender${currentUserType === 'user' ? 'User' : 'Patient'}.id`]: currentUserId,
-        [`receiver${receiverType === 'user' ? 'User' : 'Patient'}.id`]: receiverId
-      }
-    });
+// const fetchMessages = useCallback(async () => {
+//   try {
+//     setLoading(true);
+//     const response = await api.get('/messages', {
+//       params: {
+//         [`sender${currentUserType === 'user' ? 'User' : 'Patient'}.id`]: currentUserId,
+//         [`receiver${receiverType === 'user' ? 'User' : 'Patient'}.id`]: receiverId
+//       }
+//     });
 
-    // Utilisez directement response.data.member au lieu de response.data.hydra.member
-    setMessages(response.data.member || []); // Fallback sur un tableau vide si member est undefined
+//     // Utilisez directement response.data.member au lieu de response.data.hydra.member
+//     setMessages(response.data.member || []); // Fallback sur un tableau vide si member est undefined
+//   } catch (err) {
+//     if (err instanceof Error) {
+//       console.error('Erreur détaillée:', (err as any).response?.data || err.message);
+//     } else {
+//       console.error('Erreur détaillée:', err);
+//     }
+//     setError('Erreur lors du chargement des messages');
+//   } finally {
+//     setLoading(false);
+//   }
+// }, [currentUserId, currentUserType, receiverId, receiverType]);
+const fetchMessages = useCallback(async () => {
+  setLoading(true);
+  setError(null);
+  try {
+    // On déduit le rôle assistant/patient ici pour toujours couvrir les deux sens
+    const isAssistant = currentUserType === 'user';
+    const assistantId = isAssistant ? currentUserId : receiverId;
+    const patientId = isAssistant ? receiverId : currentUserId;
+
+    const [res1, res2] = await Promise.all([
+      api.get('/messages', {
+        params: {
+          'senderUser.id': assistantId,
+          'receiverPatient.id': patientId,
+          'order[createdAt]': 'asc'
+        }
+      }),
+      api.get('/messages', {
+        params: {
+          'senderPatient.id': patientId,
+          'receiverUser.id': assistantId,
+          'order[createdAt]': 'asc'
+        }
+      })
+    ]);
+
+    // Fusion, tri et fallback sur data["hydra:member"] OU data.member selon config Hydra
+    const allMessages = [
+      ...(res1.data['hydra:member'] || res1.data.member || []),
+      ...(res2.data['hydra:member'] || res2.data.member || [])
+    ].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+
+    setMessages(allMessages);
   } catch (err) {
     if (err instanceof Error) {
       console.error('Erreur détaillée:', (err as any).response?.data || err.message);
@@ -77,15 +121,6 @@ const fetchMessages = useCallback(async () => {
         },
         withCredentials: true
       });
-
-      // es.onmessage = (e) => {
-      //   try {
-      //     const message: Message = JSON.parse(e.data);
-      //     setMessages(prev => [...prev, message]);
-      //   } catch (parseErr) {
-      //     console.error('Error parsing message:', parseErr);
-      //   }
-      // };
 
       es.onmessage = (e) => {
         try {

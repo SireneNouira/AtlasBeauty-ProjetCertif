@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
@@ -11,6 +13,7 @@ use App\State\MessageProcessor;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Mercure\Attribute\Publish;
+use ApiPlatform\Doctrine\Orm\Filter\OrFilter;
 
 
 
@@ -34,6 +37,12 @@ use Symfony\Component\Mercure\Attribute\Publish;
     normalizationContext: ['groups' => ['message:read']],
     denormalizationContext: ['groups' => ['message:write']]
 )]
+#[ApiFilter(SearchFilter::class, properties: [
+    'senderUser.id' => 'exact',
+    'receiverUser.id' => 'exact',
+    'senderPatient.id' => 'exact',
+    'receiverPatient.id' => 'exact',
+])]
 class Message
 {
     #[ORM\Id, ORM\GeneratedValue, ORM\Column]

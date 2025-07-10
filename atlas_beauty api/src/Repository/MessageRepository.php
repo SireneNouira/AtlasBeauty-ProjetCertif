@@ -40,4 +40,21 @@ class MessageRepository extends ServiceEntityRepository
 //            ->getOneOrNullResult()
 //        ;
 //    }
+// src/Repository/MessageRepository.php
+
+public function findConversation($assistantId, $patientId)
+{
+    return $this->createQueryBuilder('m')
+        ->where('
+            (m.senderUser = :assistantId AND m.receiverPatient = :patientId)
+            OR
+            (m.senderPatient = :patientId AND m.receiverUser = :assistantId)
+        ')
+        ->setParameter('assistantId', $assistantId)
+        ->setParameter('patientId', $patientId)
+        ->orderBy('m.createdAt', 'ASC')
+        ->getQuery()
+        ->getResult();
+}
+
 }

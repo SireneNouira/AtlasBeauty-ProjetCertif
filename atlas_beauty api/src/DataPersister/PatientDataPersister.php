@@ -7,7 +7,6 @@ use ApiPlatform\State\ProcessorInterface;
 use App\DataTransformer\PatientGlobalDtoToEntityTransformer;
 use App\Dto\PatientGlobalDto;
 use App\Entity\Patient;
-use App\Entity\Photo;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;

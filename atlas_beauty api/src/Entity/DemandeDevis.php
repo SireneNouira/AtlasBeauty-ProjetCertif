@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\GetCollection;
@@ -42,6 +44,10 @@ operations: [
     securityMessage: "Vous ne pouvez pas modifier cette demande de devis."
 ),
 ])]
+#[ApiFilter(SearchFilter::class, properties: [
+    'patient' => 'exact',
+    // tu peux ajouter d'autres filtres si besoin
+])]
 class DemandeDevis
 {
     #[ORM\Id]
@@ -51,6 +57,7 @@ class DemandeDevis
 
     #[ORM\ManyToOne(inversedBy: 'demandeDevis')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['demande_devis:read','demande_devis:write'])]
     private ?Patient $patient = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
@@ -62,9 +69,11 @@ class DemandeDevis
     private ?\DateTimeInterface $date_souhaite = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['demande_devis:read','demande_devis:write'])]
     private ?string $status = 'envoyé';
 
     #[ORM\OneToOne(mappedBy: 'demande_devis', cascade: ['persist', 'remove'])]
+    #[Groups(['demande_devis:read','demande_devis:write'])]
     private ?Devis $devis = null;
 
     #[ORM\ManyToOne(inversedBy: 'demandeDevis')]
@@ -77,6 +86,7 @@ class DemandeDevis
     private ?Intervention $intervention_2 = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups(['demande_devis:read','demande_devis:write'])]
     private ?\DateTimeInterface $date_creation = null;
     
     public function __construct()

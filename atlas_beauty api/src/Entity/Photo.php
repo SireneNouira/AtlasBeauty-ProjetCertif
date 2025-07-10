@@ -3,6 +3,7 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\File;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
@@ -10,24 +11,32 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity]
 #[Vich\Uploadable]
+#[ApiResource(
+    normalizationContext: ['groups' => ['photo:read']],
+    denormalizationContext: ['groups' => ['photo:write']]
+)]
 class Photo
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: "integer")]
+    #[Groups(['photo:read'])]
     private ?int $id = null;
 
     #[Vich\UploadableField(mapping: "patient_photo", fileNameProperty: "photoPath")]
     private ?File $photoFile = null;
 
     #[ORM\Column(type: "string", length: 255)]
+    #[Groups(['photo:read'])]
     private ?string $photoPath = null;
 
     #[ORM\ManyToOne(targetEntity: Patient::class, inversedBy: "photos")]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['photo:read'])]
     private ?Patient $patient = null;
 
     #[ORM\Column(type: "datetime", nullable: true)]
+    #[Groups(['photo:read'])]
     private ?\DateTimeInterface $updatedAt = null;
 
     public function getId(): ?int
