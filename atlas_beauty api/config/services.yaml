@@ -57,4 +57,11 @@ services:
         autowire: true
         autoconfigure: false
 
+    App\DataTransformer\CreateDevisDataTransformer:
+        tags:
+            - { name: 'api_platform.data_transformer' }
+    App\DataPersister\DevisDataPersister:
+        tags:
+            - { name: 'api_platform.state_processor', priority: 10 }
+
 

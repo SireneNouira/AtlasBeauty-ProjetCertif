@@ -32,29 +32,6 @@ export const useChat = (
   };
 
 // Modifiez la partie fetchMessages comme ceci :
-// const fetchMessages = useCallback(async () => {
-//   try {
-//     setLoading(true);
-//     const response = await api.get('/messages', {
-//       params: {
-//         [`sender${currentUserType === 'user' ? 'User' : 'Patient'}.id`]: currentUserId,
-//         [`receiver${receiverType === 'user' ? 'User' : 'Patient'}.id`]: receiverId
-//       }
-//     });
-
-//     // Utilisez directement response.data.member au lieu de response.data.hydra.member
-//     setMessages(response.data.member || []); // Fallback sur un tableau vide si member est undefined
-//   } catch (err) {
-//     if (err instanceof Error) {
-//       console.error('Erreur détaillée:', (err as any).response?.data || err.message);
-//     } else {
-//       console.error('Erreur détaillée:', err);
-//     }
-//     setError('Erreur lors du chargement des messages');
-//   } finally {
-//     setLoading(false);
-//   }
-// }, [currentUserId, currentUserType, receiverId, receiverType]);
 const fetchMessages = useCallback(async () => {
   setLoading(true);
   setError(null);

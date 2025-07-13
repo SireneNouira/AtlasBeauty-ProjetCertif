@@ -60,7 +60,7 @@ export default function LoginForm() {
   };
 
   return (
-    <div className=" bg-pink-50 py-4 px-48 rounded-2xl">
+    <div className=" bg-pink-50 py-4 px-48 rounded-2xl flex justify-center">
       <div className="bg-white  min-w-lg px-10 py-5 rounded-2xl shadow-lg">
         {/* Header with logo and titles */}
         <div className="flex flex-col items-center mb-3">

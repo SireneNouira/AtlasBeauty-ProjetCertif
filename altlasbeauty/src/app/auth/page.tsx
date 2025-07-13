@@ -27,7 +27,7 @@ export default function AuthPage() {
 
   return (
     <div className="min-h-screen bg-pink-50 flex items-center justify-center p-4">
-<div className="w-full  overflow-y-auto bg-white p-4 rounded-2xl shadow-lg">
+<div className="w-2/3 h-full overflow-y-auto bg-white p-4 rounded-2xl shadow-lg">
 <div className="flex border-b border-gray-200 mb-5">
           <button
             onClick={() => {

@@ -43,12 +43,13 @@ export default function PatientChatPage() {
 
   return (
     <AuthGuard>
+      <section className='mt-4'>
       <Chat
         currentUserId={userData.id}
         currentUserType="patient"
         receiverId={ASSISTANT_ID}
         receiverType="user"
-      />
+      /></section>
     </AuthGuard>
   );
 }

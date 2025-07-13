@@ -10,17 +10,22 @@ use App\Repository\DevisRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\HttpFoundation\File\File;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
+use App\Dto\CreateDevisInput;
 
 #[ORM\Entity(repositoryClass: DevisRepository::class)]
 #[ApiResource(
+    input: CreateDevisInput::class,
     normalizationContext: ['groups' => ['devis:read']],
     denormalizationContext: ['groups' => ['devis:write']],
     operations: [
         new GetCollection(),
         new Get(),
-        new Post(), // tu peux aussi ajouter Put, Delete, etc.
+        new Post(inputFormats: ['multipart' => ['multipart/form-data']]),
     ]
 )]
+#[Vich\Uploadable]
 class Devis
 {
     #[ORM\Id]
@@ -33,9 +38,16 @@ class Devis
     #[Groups(['devis:read', 'devis:write'])]
     private ?Patient $patient = null;
 
+    #[Vich\UploadableField(mapping: "devis_pdf", fileNameProperty: "fichier")]
+    #[Groups(['devis:write'])]
+    private ?\Symfony\Component\HttpFoundation\File\File $devisFile = null;
+
     #[ORM\Column(length: 255)]
     #[Groups(['devis:read', 'devis:write'])]
     private ?string $fichier = null;
+
+    #[ORM\Column(type: "datetime", nullable: true)]
+    private ?\DateTimeInterface $updatedAt = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     #[Groups(['devis:read', 'devis:write'])]
@@ -128,5 +140,29 @@ class Devis
         $this->demande_devis = $demande_devis;
 
         return $this;
+    }
+
+    public function setDevisFile(?File $file = null): void
+    {
+        $this->devisFile = $file;
+        if ($file !== null) {
+            $this->updatedAt = new \DateTime();
+        }
+    }
+
+    public function getDevisFile(): ?File
+    {
+        return $this->devisFile;
+    }
+
+    // Ajoute getter/setter updatedAt si pas déjà présent
+    public function getUpdatedAt(): ?\DateTimeInterface
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTimeInterface $updatedAt): void
+    {
+        $this->updatedAt = $updatedAt;
     }
 }
