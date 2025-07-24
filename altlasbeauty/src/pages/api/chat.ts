@@ -10,8 +10,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       
       "https://openrouter.ai/api/v1/chat/completions",
       {
-        // model: "openrouter/auto", 
-        model: "mistralai/mistral-7b-instruct",
+        model: "openrouter/auto", 
+        //model: "mistralai/mistral-7b-instruct",
         max_tokens: 500, 
         messages: [
           {

@@ -24,7 +24,7 @@ operations: [
         security: "is_granted('DEMANDE_DEVIS_VIEW', object)"
     ),
     new GetCollection(
-    security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_ASSISTANT') or is_granted('ROLE_USER')"
+    security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_ASSISTANT')"
 ),
     new Post(
         security: "is_granted('DEMANDE_DEVIS_CREATE')",

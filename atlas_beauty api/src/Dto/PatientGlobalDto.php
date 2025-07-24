@@ -2,36 +2,30 @@
 
 namespace App\Dto;
 
-use App\Entity\Intervention;
-use Dom\Text;
-use phpDocumentor\Reflection\Types\Nullable;
-use Symfony\Component\HttpFoundation\File\File;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Serializer\Annotation\Groups;
-use Symfony\Component\Validator\Constraints\Date;
-use Symfony\Component\Validator\Constraints\Type;
+
 
 class PatientGlobalDto
 {
-    // #[Assert\NotBlank]
+    #[Assert\NotBlank]
     #[Assert\Email]
     #[Groups(['patient:write'])]
     public string $email;
 
-    // #[Assert\NotBlank]
+    #[Assert\NotBlank]
     #[Groups(['patient:write'])]
     public string $password;
 
-    // #[Assert\NotBlank]
+    #[Assert\NotBlank]
     #[Groups(['patient:write'])]
     public string $nom;
 
-    // #[Assert\NotBlank]
+    #[Assert\NotBlank]
     #[Groups(['patient:write'])]
     public string $prenom;
 
-    //#[Assert\NotBlank]
+    #[Assert\NotBlank]
     #[Groups(['patient:write'])]
     public string $civilite;
 
@@ -39,41 +33,39 @@ class PatientGlobalDto
     #[Groups(['patient:write'])]
     public int $annee_naissance;
 
-    //#[Assert\NotBlank]
+    #[Assert\NotBlank]
     #[Groups(['patient:write'])]
     public string $pays;
 
-    //#[Assert\NotBlank]
+    #[Assert\NotBlank]
     #[Groups(['patient:write'])]
     public string $profession;
 
-    //#[Assert\NotBlank]
+    #[Assert\NotBlank]
     #[Groups(['patient:write'])]
     public string $tel;
 
-    //#[Assert\NotBlank]
+    #[Assert\NotBlank]
     #[Groups(['patient:write'])]
     public float $poids;
-    
-    //#[Assert\NotBlank]
+
+    #[Assert\NotBlank]
     #[Groups(['patient:write'])]
     public float $taille;
-
-
 
     #[Assert\Type('string')]
     #[Groups(['patient:write'])]
     public ?string $antecedents = null;
 
-    //#[Assert\NotBlank]
+    #[Assert\NotBlank]
     #[Groups(['patient:write'])]
     public string $ville;
 
-    //#[Assert\NotBlank]
+    #[Assert\NotBlank]
     #[Groups(['patient:write'])]
     public string $adress;
-    
-    //#[Assert\NotBlank]
+
+    #[Assert\NotBlank]
     #[Groups(['patient:write'])]
     public string $code_postal;
 
@@ -93,17 +85,17 @@ class PatientGlobalDto
             'mimeTypesMessage' => 'Please upload a valid image (JPEG or PNG)',
         ])
     ])]
-    public ?array $photoFiles = [];
-    
 
-    //#[Assert\NotBlank]
+    public ?array $photoFiles = [];
+
+    #[Assert\NotBlank]
     #[Groups(['patient:write'])]
     public string $note;
 
     #[Groups(['patient:write'])]
     public string $date_souhaite;
 
-    //#[Assert\NotBlank]
+    #[Assert\NotBlank]
     #[Groups(['patient:write'])]
     public string $intervention_1_name;
 
@@ -111,4 +103,3 @@ class PatientGlobalDto
     #[Groups(['patient:write'])]
     public ?string $intervention_2_name = null;
 }
-

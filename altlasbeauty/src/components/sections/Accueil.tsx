@@ -33,14 +33,14 @@ function Accueil() {
             <IoIosLeaf className="text-lg" />
             Un voyage de soins, en douceur et en confiance.
           </p>
-          <button className="bg-rose-500 hover:bg-blue-400 hover:text-blue-700 text-white w-52 h-11 rounded-4xl text-lg font-medium mt-9">
+          <button className="bg-rose-500 hover:bg-blue-400 hover:text-blue-700 text-white w-52 h-11 rounded-4xl text-lg font-medium mt-9 mb-5">
             Consultation Gratuite
           </button>
         </div>
       </div>
 
       {/* Right side */}
-      <div className="mx-auto mt-8 ">
+      <div className="mx-auto mt-8 hidden">
         <img
           src="/atlas/silhouette.png"
           alt="silhouette"

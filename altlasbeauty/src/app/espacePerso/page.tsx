@@ -38,7 +38,6 @@ export default function EspacePersoPage() {
 
   const handleNavigation = (targetView: ViewType) => {
     setView(targetView);
-    // Optionnel: mettre à jour l'URL sans recharger la page
     router.replace(`/espacePerso?view=${targetView}`, { scroll: false });
   };
 
@@ -57,7 +56,11 @@ export default function EspacePersoPage() {
       case "photos":
         return <Photos />;
       case "messages":
-        return <div>Messages (à implémenter)</div>;
+        return (
+          <div className="rounded-2xl shadow-md bg-white p-8 text-center">
+            Messages (à implémenter)
+          </div>
+        );
       default:
         return <MeInfo onConsult={() => handleNavigation("dossier")} />;
     }
@@ -66,9 +69,12 @@ export default function EspacePersoPage() {
   return (
     <AuthGuard>
       <EspacePersoProvider>
-        <div className="flex flex-col min-h-screen">
-          {/* ─────────────── HEADER ─────────────── */}
-          <header className="grid grid-cols-3 items-center bg-white px-8 py-2 shadow-md z-10">
+        <div className="flex flex-col min-h-screen bg-gradient-to-br from-sky-50 via-blue-50 to-cyan-100">
+          {/* HEADER */}
+          <header
+            className="grid grid-cols-3 items-center bg-white/90 px-8 py-3 shadow-sm border-b border-blue-100 sticky top-0 z-20"
+            aria-label="En-tête espace personnel"
+          >
             {/* logo */}
             <div className="col-start-1">
               <Image
@@ -77,6 +83,8 @@ export default function EspacePersoPage() {
                 width={80}
                 height={40}
                 priority
+                className="rounded-xl shadow focus:outline-blue-500 focus-visible:outline-2"
+                tabIndex={0}
               />
             </div>
 
@@ -84,10 +92,12 @@ export default function EspacePersoPage() {
             <div className="col-start-2 flex justify-center">
               <Image
                 src="/atlas/fleur.png"
-                alt="Lotus"
+                alt="Symbole lotus"
                 width={60}
                 height={40}
                 priority
+                className="opacity-80"
+                tabIndex={0}
               />
             </div>
 
@@ -95,17 +105,26 @@ export default function EspacePersoPage() {
             <div className="col-start-3 flex justify-end">
               <Link
                 href="/"
-                className="bg-blue-500 text-white px-4 py-1 rounded-lg hover:bg-blue-600 transition"
+                className="bg-gradient-to-r from-sky-400 to-blue-500 text-white px-6 py-2 rounded-xl shadow hover:brightness-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-600 transition text-lg font-semibold"
+                aria-label="Retour à la page d'accueil du site"
               >
                 Retour au site
               </Link>
             </div>
           </header>
 
-          {/* ─────────────── CONTENT ─────────────── */} 
-          <div className="flex flex-1 bg-sky-200">
+          {/* CONTENT */}
+          <div className="flex flex-1 bg-sky-100/60" aria-label="Contenu espace personnel">
             <Sidebar onNavigate={handleNavigation} currentView={view} />
-            <main className="flex-1 p-12">{renderContent()}</main>
+            <main
+              className="flex-1 flex flex-col items-center px-4 py-10 md:px-12 lg:px-24"
+              tabIndex={0}
+              aria-live="polite"
+            >
+              <div className="w-full max-w-3xl">
+                {renderContent()}
+              </div>
+            </main>
           </div>
         </div>
       </EspacePersoProvider>

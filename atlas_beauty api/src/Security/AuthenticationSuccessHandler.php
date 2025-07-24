@@ -45,7 +45,7 @@ class AuthenticationSuccessHandler implements AuthenticationSuccessHandlerInterf
         ]);
                 $response->headers->setCookie(
              new Cookie('BEARER', $jwt, 0, '/', null, false, true, false, 'Strict') // a enlever pour la mise en prod 
-            // new Cookie('BEARER', $jwt, 0, '/', null, true, true, false, 'Strict') // HttpOnly et Secure ajouter pour la mise en prod
+             // HttpOnly et Secure ajouter pour la mise en prod
         );
 
         return $response;

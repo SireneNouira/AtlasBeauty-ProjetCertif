@@ -71,7 +71,7 @@ export default function Chatbot() {
           onKeyDown={(e) => e.key === "Enter" && sendMessage()}
         />
         <button
-          className="bg-blue-500 text-white px-4 rounded-r"
+          className="bg-blue-500 text-white px-4 rounded-r "
           onClick={sendMessage}
         >
           Envoyer

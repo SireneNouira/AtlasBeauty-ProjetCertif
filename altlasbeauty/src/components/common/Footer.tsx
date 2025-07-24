@@ -7,12 +7,12 @@ function Footer() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
-      className="bg-stone-800 text-white py-10 px-6 md:px-20"
+      className="bg-stone-800 text-white py-10 px-4 sm:px-6 md:px-20"
     >
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-10">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10">
         {/* Logo & Description */}
         <div>
-          <img src="/atlas/nom.png" alt="AtlasBeauty" className="mb-4 w-40" />
+          <img src="/atlas/nom.png" alt="AtlasBeauty" className="mb-4 w-32 sm:w-40" />
           <p className="text-sm text-gray-300">
             AtlasBeauty est une agence de tourisme médical Franco-Tunisienne
             spécialisée en chirurgie réparatrice et esthétique, en coopération
@@ -22,8 +22,9 @@ function Footer() {
 
         {/* Contact */}
         <div>
-          <h3 className="text-lg font-semibold mb-2">Contact</h3>
-          <p className="text-sm">📞 WhatsApp : <br />
+          <h3 className="text-base sm:text-lg font-semibold mb-2">Contact</h3>
+          <p className="text-sm">
+            📞 WhatsApp : <br />
             <span className="text-base font-medium">+216 00 00 00 00</span>
           </p>
           <p className="text-sm mt-2">✉️ contact@atlas-beauty.fr</p>
@@ -31,7 +32,7 @@ function Footer() {
 
         {/* Liens utiles */}
         <div>
-          <h3 className="text-lg font-semibold mb-2">Liens utiles</h3>
+          <h3 className="text-base sm:text-lg font-semibold mb-2">Liens utiles</h3>
           <ul className="text-sm space-y-2">
             <li><a href="#" className="hover:underline">Qui sommes-nous ?</a></li>
             <li><a href="#" className="hover:underline">Tarifs Chirurgie Esthétique</a></li>
@@ -43,8 +44,10 @@ function Footer() {
 
         {/* Newsletter */}
         <div>
-          <h3 className="text-lg font-semibold mb-2">Restez informé</h3>
-          <p className="text-sm text-gray-300 mb-3">Soyez informé(e) en avant-première de nos offres spéciales séjour + intervention et de nos nouveautés.</p>
+          <h3 className="text-base sm:text-lg font-semibold mb-2">Restez informé</h3>
+          <p className="text-sm text-gray-300 mb-3">
+            Soyez informé(e) en avant-première de nos offres spéciales séjour + intervention et de nos nouveautés.
+          </p>
           <form className="flex flex-col space-y-3">
             <input
               type="email"

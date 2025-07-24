@@ -10,7 +10,6 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class PatientVoter extends Voter
 {
-    // Définition des actions possibles
     const VIEW = 'PATIENT_VIEW';
     const EDIT = 'PATIENT_EDIT';
     const DELETE = 'PATIENT_DELETE';

@@ -111,7 +111,6 @@ if (loading && messages.length === 0) {
                   })}
                 </span>
               </div>
-              {/* Avatar à droite pour l’envoyeur ? (optionnel, à activer si tu veux) */}
               {mine && (
                 <div className="ml-2 flex-shrink-0">
                   <UserCircle className="w-8 h-8 text-blue-400/60" />

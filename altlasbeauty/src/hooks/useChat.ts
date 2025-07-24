@@ -1,11 +1,27 @@
 // hooks/useChat.ts
 'use client'
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { EventSourcePolyfill } from 'event-source-polyfill';
 import api from '@/utils/api';
 import { Message, ChatParticipant } from '@/types/message';
 import { UserRole } from '@/types/user';
+
+// Normalise tous les messages entrants pour que la détection du sender fonctionne TOUJOURS
+function normalizeMessage(msg: any): Message {
+  // senderUser string --> { id }
+  if (typeof msg.senderUser === "string") {
+    const match = msg.senderUser.match(/\/api\/users\/(\d+)/);
+    msg.senderUser = match ? { id: Number(match[1]) } : undefined;
+  }
+  // receiverUser string --> { id }
+  if (typeof msg.receiverUser === "string") {
+    const match = msg.receiverUser.match(/\/api\/users\/(\d+)/);
+    msg.receiverUser = match ? { id: Number(match[1]) } : undefined;
+  }
+  // Tu peux ajouter d'autres adaptations ici si tu ajoutes des types
+  return msg;
+}
 
 export const useChat = (
   currentUserId: number,
@@ -16,7 +32,7 @@ export const useChat = (
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [eventSource, setEventSource] = useState<EventSourcePolyfill | null>(null);
+  const eventSourceRef = useRef<EventSourcePolyfill | null>(null);
 
   // Format participants
   const currentParticipant: ChatParticipant = {
@@ -31,58 +47,51 @@ export const useChat = (
     name: receiverType === 'patient' ? 'Patient' : 'Assistant'
   };
 
-// Modifiez la partie fetchMessages comme ceci :
-const fetchMessages = useCallback(async () => {
-  setLoading(true);
-  setError(null);
-  try {
-    // On déduit le rôle assistant/patient ici pour toujours couvrir les deux sens
-    const isAssistant = currentUserType === 'user';
-    const assistantId = isAssistant ? currentUserId : receiverId;
-    const patientId = isAssistant ? receiverId : currentUserId;
+  // Récupération des messages (fetch initial)
+  const fetchMessages = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const isAssistant = currentUserType === 'user';
+      const assistantId = isAssistant ? currentUserId : receiverId;
+      const patientId = isAssistant ? receiverId : currentUserId;
 
-    const [res1, res2] = await Promise.all([
-      api.get('/messages', {
-        params: {
-          'senderUser.id': assistantId,
-          'receiverPatient.id': patientId,
-          'order[createdAt]': 'asc'
-        }
-      }),
-      api.get('/messages', {
-        params: {
-          'senderPatient.id': patientId,
-          'receiverUser.id': assistantId,
-          'order[createdAt]': 'asc'
-        }
-      })
-    ]);
+      const [res1, res2] = await Promise.all([
+        api.get('/messages', {
+          params: {
+            'senderUser.id': assistantId,
+            'receiverPatient.id': patientId,
+            'order[createdAt]': 'asc'
+          }
+        }),
+        api.get('/messages', {
+          params: {
+            'senderPatient.id': patientId,
+            'receiverUser.id': assistantId,
+            'order[createdAt]': 'asc'
+          }
+        })
+      ]);
 
-    // Fusion, tri et fallback sur data["hydra:member"] OU data.member selon config Hydra
-    const allMessages = [
-      ...(res1.data['hydra:member'] || res1.data.member || []),
-      ...(res2.data['hydra:member'] || res2.data.member || [])
-    ].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+      const allMessages = [
+        ...(res1.data['hydra:member'] || res1.data.member || []),
+        ...(res2.data['hydra:member'] || res2.data.member || [])
+      ]
+        .map(normalizeMessage)
+        .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
 
-    setMessages(allMessages);
-  } catch (err) {
-    if (err instanceof Error) {
-      console.error('Erreur détaillée:', (err as any).response?.data || err.message);
-    } else {
-      console.error('Erreur détaillée:', err);
+      setMessages(allMessages);
+    } catch (err) {
+      setError('Erreur lors du chargement des messages');
+    } finally {
+      setLoading(false);
     }
-    setError('Erreur lors du chargement des messages');
-  } finally {
-    setLoading(false);
-  }
-}, [currentUserId, currentUserType, receiverId, receiverType]);
+  }, [currentUserId, currentUserType, receiverId, receiverType]);
 
-
-  // Initialize Mercure connection
+  // Connexion Mercure
   const initMercure = useCallback(async () => {
     try {
-      // Get Mercure token from your API
-      const tokenResponse = await api.get<{token: string}>('/mercure-token');
+      const tokenResponse = await api.get<{ token: string }>('/mercure-token');
       const token = tokenResponse.data.token;
 
       const topics = [
@@ -91,45 +100,60 @@ const fetchMessages = useCallback(async () => {
       ].map(encodeURIComponent).join('&topic=');
 
       const url = `http://localhost:3001/.well-known/mercure?topic=${topics}`;
-      
+
       const es = new EventSourcePolyfill(url, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        },
+        headers: { Authorization: `Bearer ${token}` },
         withCredentials: true
       });
 
       es.onmessage = (e) => {
         try {
-          const incoming: Message = JSON.parse(e.data);
-      
+          const incoming: Message = normalizeMessage(JSON.parse(e.data));
           setMessages(prev => {
-            // Si on a déjà ce message (même id), on ne le ré-ajoute pas
-            if (prev.some(m => m.id === incoming.id)) {
-              return prev;
-            }
-            return [...prev, incoming];
+            const filtered = prev.filter(m => {
+              // Retire l’optimiste équivalent ou tout doublon d’id
+              if (
+                typeof m.id === "string" && m.id.startsWith("temp-") &&
+                m.content === incoming.content &&
+                Math.abs(new Date(m.createdAt).getTime() - new Date(incoming.createdAt).getTime()) < 4000
+              ) return false;
+              if (m.id === incoming.id) return false;
+              return true;
+            });
+            return [...filtered, incoming];
           });
-        } catch (err) {
-          console.error('Error parsing message:', err);
-        }
+        } catch (err) {}
       };
 
-      
       es.onerror = (e) => {
-        console.error('Mercure error:', e);
         setError('Problème de connexion en temps réel');
       };
 
-      setEventSource(es);
+      eventSourceRef.current = es;
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erreur de connexion Mercure');
+      setError('Erreur de connexion Mercure');
     }
   }, [currentUserId, currentUserType, receiverId, receiverType]);
 
-  // Send message
+  // Envoi d'un message avec affichage optimiste
   const sendMessage = useCallback(async (content: string) => {
     if (!content.trim()) return;
+
+    const optimisticMessage: Message = {
+      id: 'temp-' + Date.now(),
+      content,
+      createdAt: new Date().toISOString(),
+      ...(currentUserType === 'user'
+        ? { senderUser: { id: currentUserId } }
+        : { senderPatient: `/api/patients/${currentUserId}` }
+      ),
+      ...(receiverType === 'user'
+        ? { receiverUser: { id: receiverId } }
+        : { receiverPatient: `/api/patients/${receiverId}` }
+      )
+    };
+
+    setMessages((prev) => [...prev, optimisticMessage]);
 
     try {
       const messageData = {
@@ -139,20 +163,20 @@ const fetchMessages = useCallback(async () => {
       };
 
       await api.post('/messages', messageData);
+      // On attend Mercure pour la confirmation
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erreur lors de l\'envoi du message');
-      throw err;
+      setError('Erreur lors de l\'envoi du message');
     }
   }, [currentUserId, currentUserType, receiverId, receiverType]);
 
-  // Effects
+  // Mount / Unmount
   useEffect(() => {
     fetchMessages();
     initMercure();
 
     return () => {
-      if (eventSource) {
-        eventSource.close();
+      if (eventSourceRef.current) {
+        eventSourceRef.current.close();
       }
     };
   }, [fetchMessages, initMercure]);

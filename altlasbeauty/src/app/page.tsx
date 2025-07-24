@@ -88,7 +88,7 @@ export default function Home() {
        <div className="fixed bottom-6 right-6 z-50">
         <button
           onClick={() => setIsChatbotOpen(!isChatbotOpen)}
-          className="w-16 h-16 rounded-full bg-rose-500 text-white text-3xl flex items-center justify-center shadow-lg hover:bg-rose-600 transition"
+          className="w-16 h-16 rounded-full bg-rose-500 text-white text-3xl flex items-center justify-center shadow-lg hover:bg-rose-600 transition sm:w-10 sm:h-10 sm:text-xl"
         >
           💬
         </button>

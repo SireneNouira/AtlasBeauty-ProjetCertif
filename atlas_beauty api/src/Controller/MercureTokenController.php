@@ -22,24 +22,15 @@ class MercureTokenController extends AbstractController
         } elseif ($user instanceof Patient) {
             $topics[] = "http://example.com/chat/patient-{$user->getId()}";
         }
-
         $payload = [
             'mercure' => [
-                // Vous pouvez restreindre la souscription
                 'subscribe' => $topics,
-
-                // ⚠️ Par défaut vous aviez mis $topics ici, 
-                //     il faut impérativement autoriser '*' pour la publication
                 'publish'   => ['*'],
             ],
             'exp'     => (new \DateTimeImmutable('+6 hour'))->getTimestamp(),
         ];
-
         $jwtSecret = $this->getParameter('mercure_jwt_secret');
         $jwt       = JWT::encode($payload, $jwtSecret, 'HS256');
-
-     
-
         return $this->json(['token' => $jwt]);
     }
 }

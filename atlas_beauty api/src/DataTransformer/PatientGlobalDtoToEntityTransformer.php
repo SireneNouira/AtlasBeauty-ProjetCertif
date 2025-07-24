@@ -16,7 +16,6 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 class PatientGlobalDtoToEntityTransformer
 {
-
     public function __construct(
         private SerializerInterface $serializer,
         private EntityManagerInterface $entityManager,
@@ -24,10 +23,6 @@ class PatientGlobalDtoToEntityTransformer
 
     public function transform(PatientGlobalDto $dto, Patient $patient,  array $context = []): Patient
     {
-
-        // Conservation de photoFile pour traitement ultérieur
-        // $photoFile = $dto->photoFile;
-
         // Si un patient existe déjà (pour une mise à jour), on le récupère
         $context = [
             AbstractNormalizer::GROUPS => ['patient:write'],
@@ -36,28 +31,27 @@ class PatientGlobalDtoToEntityTransformer
             $context[AbstractNormalizer::OBJECT_TO_POPULATE] = $patient;
         }
 
-        // dd($dto);
-
         // Transfert manuel des propriétés du DTO vers l'entité Patient
         $patient->setEmail($dto->email);
         if (!empty($dto->password)) {
             $patient->setPassword($dto->password);
         }
-        $patient->setNom($dto->nom);
-        $patient->setPrenom($dto->prenom);
-        $patient->setCivilite($dto->civilite);
-        $patient->setAnneeNaissance($dto->annee_naissance);
-        $patient->setPays($dto->pays);
-        $patient->setProfession($dto->profession);
-        $patient->setTel($dto->tel);
-        $patient->setPoids($dto->poids);
-        $patient->setTaille($dto->taille);
-        $patient->setTabac($dto->tabac);
-        $patient->setAlcool($dto->alcool);
-        $patient->setAntecedents($dto->antecedents);
-        $patient->setVille($dto->ville);
-        $patient->setAdress($dto->adress);
-        $patient->setCodePostal($dto->code_postal);
+
+            $patient->setNom($dto->nom);
+            $patient->setPrenom($dto->prenom);
+            $patient->setCivilite($dto->civilite);
+            $patient->setAnneeNaissance($dto->annee_naissance);
+            $patient->setPays($dto->pays);
+            $patient->setProfession($dto->profession);
+            $patient->setTel($dto->tel);
+            $patient->setPoids($dto->poids);
+            $patient->setTaille($dto->taille);
+            $patient->setTabac($dto->tabac);
+            $patient->setAlcool($dto->alcool);
+            $patient->setAntecedents($dto->antecedents);
+            $patient->setVille($dto->ville);
+            $patient->setAdress($dto->adress);
+            $patient->setCodePostal($dto->code_postal);
 
         if ($dto->photoFiles) {
             foreach ($dto->photoFiles as $uploadedFile) {
@@ -69,7 +63,6 @@ class PatientGlobalDtoToEntityTransformer
                 }
             }
         }
-
 
         // Crée la demande de devis associée
         $demandeDevis = new DemandeDevis();
@@ -94,9 +87,6 @@ class PatientGlobalDtoToEntityTransformer
             }
         }
 
-
-
-
         if ($dto->intervention_2_name) {
 
             $intervention2 = $this->entityManager
@@ -107,11 +97,8 @@ class PatientGlobalDtoToEntityTransformer
                 $demandeDevis->setIntervention2($intervention2);
             }
         }
-
         // Associe les entités
         $patient->addDemandeDevis($demandeDevis);
-
-
 
         return $patient;
     }

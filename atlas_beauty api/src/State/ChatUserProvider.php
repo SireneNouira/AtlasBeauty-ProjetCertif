@@ -30,9 +30,8 @@ class ChatUserProvider implements ProviderInterface
         if ($user instanceof Patient) {
             $dto->prenom = $user->getPrenom();
             $dto->nom = $user->getNom();
-            // Ajoutez d'autres champs spécifiques au patient si nécessaire
         } else {
-            $dto->prenom = 'Assistant'; // Ou récupérez le prénom réel si disponible
+            $dto->prenom = 'Assistant'; 
             $dto->nom = '';
         }
 

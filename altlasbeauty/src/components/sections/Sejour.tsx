@@ -3,23 +3,24 @@ import React from "react";
 function Sejour() {
   return (
     <section className="pb-16">
-      <div className="flex flex-col ml-16">
-        <div className="w-2/3 h-12 bg-pink-100  flex items-center rounded">
-          <p className="ml-44 font-bold text-lg">
+      <div className="flex flex-col ml-4 sm:ml-16">
+        <div className="w-[90%] sm:w-2/3 h-12 bg-pink-100 flex items-center rounded">
+          <p className="mx-auto sm:ml-44 font-bold text-base sm:text-lg text-center sm:text-left">
             Votre séjour de chirurgie esthétique en Tunisie
           </p>
         </div>
 
-        <div className="ml-36 w-fit h-9 bg-blue-500 rounded flex justify-center items-center font-bold -mt-1.5 px-3">
-          <h2 className="text-white text-xl">Votre séjour en 7 étapes</h2>
+        <div className="ml-8 sm:ml-36 w-fit h-9 bg-blue-500 rounded flex justify-center items-center font-bold -mt-1.5 px-3">
+          <h2 className="text-white text-lg sm:text-xl text-center">
+            Votre séjour en 7 étapes
+          </h2>
         </div>
       </div>
 
-      <article className="flex justify-between my-14 ml-36">
+      <article className="flex flex-col-reverse sm:flex-row justify-between mt-10 sm:my-14 px-4 sm:ml-36 gap-8">
         {/* Texte à gauche */}
-        <div className="">
-        <ol className="list-decimal list-inside space-y-5 text-gray-800">
-
+        <div>
+          <ol className="list-decimal list-inside space-y-5 text-gray-800 text-sm sm:text-base">
             <li className="underline decoration-blue-500">
               Envoi de votre dossier médical
             </li>
@@ -32,15 +33,14 @@ function Sejour() {
           </ol>
         </div>
 
-        {/* Image qui sort du article */}
-
-        <div className="relative flex justify-end">
-          {/* Overlay bleu semi-transparent */}
-          <div className="absolute top-[-40px] bottom-[-40px] left-16 w-[45%] bg-blue-500/75 z-10">
-            <h4 className="text-white p-3 font-bold">
+        {/* Image + overlay */}
+        <div className="relative flex justify-center sm:justify-end">
+          {/* Overlay bleu */}
+          <div className="absolute top-[-20px]  sm:top-[-40px] bottom-[-20px] sm:bottom-[-40px] left-6 sm:left-16 w-[90%] sm:w-[45%] bg-blue-500/90 z-10">
+            <h4 className="text-white p-3 font-bold text-sm sm:text-base">
               Votre expert en chirurgie esthétique en Tunisie
-            </h4>{" "}
-            <p className=" p-3 text-white font-medium">
+            </h4>
+            <p className="p-3 text-white font-medium text-sm sm:text-base">
               Notre agence de tourisme médical en Tunisie vous accompagne à
               chaque étape : prise de contact, organisation du séjour,
               intervention et suivi post-opératoire. Spécialisée en chirurgie
@@ -56,7 +56,7 @@ function Sejour() {
             alt="tunis"
             width={550}
             height={400}
-            className="z-0"
+            className="z-0 max-w-full h-auto"
           />
         </div>
       </article>
@@ -64,17 +64,5 @@ function Sejour() {
   );
 }
 
+
 export default Sejour;
-// 1 - Envoi de votre dossier médical
-
-// 2 - Réponse de l’équipe médicale
-
-// 3 - Préparation de votre intervention...
-
-// 4 - Votre arrivée à Tunis
-
-// 5 - Votre intervention
-
-// 6 - Des jours qui suivent l’intervention...
-
-// 7 - ChirurgiePro garde le contact

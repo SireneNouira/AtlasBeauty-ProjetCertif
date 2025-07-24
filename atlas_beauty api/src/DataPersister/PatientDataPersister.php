@@ -1,5 +1,5 @@
 <?php
-// Ce fichier est a créer dans src/DataPersister
+
 namespace App\DataPersister;
 
 use ApiPlatform\Metadata\Operation;
@@ -23,8 +23,6 @@ class PatientDataPersister implements ProcessorInterface
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): Patient
     {
 
-        // dd($data);
-
         if ($data instanceof PatientGlobalDto) {
             // Transformez le DTO en entité Patient
             $patient = $this->transformer->transform($data, new Patient());
@@ -35,7 +33,6 @@ class PatientDataPersister implements ProcessorInterface
             }
             $patient->setRoles(['ROLE_USER']);
 
-            // dd($patient);
             // Persistez le patient et les entités associées
             $this->entityManager->persist($patient);
 
@@ -51,8 +48,6 @@ class PatientDataPersister implements ProcessorInterface
             $this->entityManager->flush();
             return $data;
         }
-
-
 
         throw new \InvalidArgumentException('Unsupported data type');
     }
